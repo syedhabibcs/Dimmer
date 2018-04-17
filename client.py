@@ -77,6 +77,7 @@ if __name__ == '__main__':
     print('Printing Signal Received From the Server: %s'%signal)
 
     client.sendLuxSensorValue()
+    # client.setGPIO(signal)
 
     # binary = client.ledBrightnessToGpio(signal)
     # print(binary)

@@ -40,6 +40,15 @@
     background: #4CAF50;
     cursor: pointer;
 }
+
+.lux_display{
+    width: 320px;
+    padding: 10px;
+    border: 5px solid gray;
+    margin: 0;
+    font-size: 50px;
+    text-align: center;
+}
 </style>
 </head>
 <body>
@@ -47,18 +56,59 @@
 <h1>Light Brighness:</h1>
 
 <div class="""slidecontainer">
-  <input type="range" min="0" max="100" value="50" class="slider" id="myRange" step=10>
-  <p>Value: <span id="demo"></span></p>
+    <input type="range" min="0" max="100" value="50" class="slider" id="myRange" step=10>
+    
+    <p>Value: <span id="demo"></span></p>
 </div>
+<div class="luxvalue">
+    <h1>Lux Value:</h1>
 
+    <div id='lux'  class="lux_display"></div>
+
+</div>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
+    
+    // http_url = 'http://140.193.217.63:5000/signal/'
+    http_url = 'http://192.168.0.17:5000/signal/'
+    
+
     var slider = document.getElementById("myRange");
     var output = document.getElementById("demo");
     output.innerHTML = slider.value;
 
+    var xhr = new XMLHttpRequest();
+    
+    var data = new FormData();
+    xhr.onload = function () {
+        console.log(this.responseText);
+    };
+    
+
     slider.oninput = function() {
-    output.innerHTML = this.value;
+        output.innerHTML = this.value;
+        xhr.open('POST', http_url, true);
+        data.append('led_value', slider.value);
+        xhr.send(data);
+        data.delete('led_value')
+        
     }
+
+    var i=2;
+    $(function poll(){
+        var $flux_value = $('#lux');
+        setTimeout(function(){
+            $.ajax({ type: 'GET', url: 'http://192.168.0.17:5000/flux/', success: function(flux_value){
+                //Update flux value
+                 $flux_value.text(flux_value['lux_value']); 
+                i = i+1;
+                console.log(i);
+                //Setup the next poll recursively
+                poll();
+            }, dataType: "json"});
+        }, 2000);
+    });
+    
 </script>
 
 </body>
