@@ -1,16 +1,21 @@
 import requests
 import os
+import smbus
 import time
+import sys
 
 # Rasberry pi specific imports
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
+
 
 class Client:
-
-    url = 'http://0.0.0.0:5000/'
+    # url = 'http://0.0.0.0:5000/'
+    # signalUrl = 'http://0.0.0.0:5000/signal/'
+    url = 'http://140.193.217.63:5000/'
     signalUrl = 'http://0.0.0.0:5000/signal/'
 
     lux_sensor = {}
+    DEBUG = False
 
     def connect(self, url, isGet, lux_value):
         if isGet:
@@ -19,65 +24,106 @@ class Client:
             response = requests.post(url, lux_value)
 
         assert response.status_code == 200
-        
+
         return response
 
     def showJsonFormattedData(self):
         response = self.connect(Client.url)
-        data=response.json()
-        print('Printing Json Formatted Data: ')
-        print(data['1'])
+        data = response.json()
+        self.log('Printing Json Formatted Data: ')
+        self.log(data['1'])
 
     def showReceivedLEDSignal(self):
         response = self.connect(Client.url, True, None)
-        data=response.text
+        data = response.text
         return data
 
     def sendLuxSensorValue(self):
-        Client.lux_sensor['lux_sensor_value'] = '50'
-        response = self.connect(Client.url, False, lux_sensor)
-
+        lux_value = str(self.getLuxSensorValue())
+        self.log("lux_sensor" + lux_value)
+        Client.lux_sensor['lux_sensor_value'] = lux_value
+        response = self.connect(Client.url, False, Client.lux_sensor)
 
     def setGPIO(self, led_brightness):
-        numOfBits = 4 #number of bits required to represent the required states
+        numOfBits = 4  # number of bits required to represent the required states
         # will set the GPIO pins
-        gpio_pins=[4, 17, 27, 22] #Using BCM modes
+        gpio_pins = [17, 27, 22, 23]  # Using BCM modes
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
-        for i in range(0,numOfBits4):
-            GPIO.setup(pin[i], GPIO.OUT)
+        for i in range(0, numOfBits):
+            GPIO.setup(gpio_pins[i], GPIO.OUT)
 
-        pinToSet = self.ledBrightnessToGpio()
+        pinToSet = self.ledBrightnessToGpio(led_brightness)
+        self.log(pinToSet)
 
-        for i in range(0,numOfBits4):
+        for i in range(0, numOfBits):
             if int(pinToSet[i]) == 1:
                 GPIO.output(gpio_pins[i], GPIO.HIGH)
-            else:   #Redundent, left for future uses
+            else:  # Redundent, left for future uses
                 GPIO.output(gpio_pins[i], GPIO.LOW)
-            time.sleep(1)
-
+            # time.sleep(1)
 
         return None
 
-    #Given the led brightness percentage as a string will convert it to the corresponding binary to set the GPIO pins
+    def getLuxSensorValue(self):
+        # Get I2C bus
+        bus = smbus.SMBus(1)
+
+        # TSL2561 address, 0x39(57)
+        # Select control register, 0x00(00) with command register, 0x80(128)
+        #       0x03(03)    Power ON mode
+        bus.write_byte_data(0x39, 0x00 | 0x80, 0x03)
+        # TSL2561 address, 0x39(57)
+        # Select timing register, 0x01(01) with command register, 0x80(128)
+        #       0x02(02)    Nominal integration time = 402ms
+        bus.write_byte_data(0x39, 0x01 | 0x80, 0x02)
+
+        # Read data back from 0x0C(12) with command register, 0x80(128), 2 bytes
+        # ch0 LSB, ch0 MSB
+        data = bus.read_i2c_block_data(0x39, 0x0C | 0x80, 2)
+
+        # Read data back from 0x0E(14) with command register, 0x80(128), 2 bytes
+        # ch1 LSB, ch1 MSB
+        data1 = bus.read_i2c_block_data(0x39, 0x0E | 0x80, 2)
+
+        # Convert the data
+        ch0 = data[1] * 256 + data[0]
+        ch1 = data1[1] * 256 + data1[0]
+
+        # Output data to screen
+        # print "Full Spectrum(IR + Visible) :%d lux" %ch0
+        # print "Infrared Value :%d lux" %ch1
+        # print "Visible Value :%d lux" %(ch0 - ch1)
+
+        return (ch0 - ch1) / 2
+
+    # Given the led brightness percentage as a string will convert it to the corresponding binary to set the GPIO pins
     def ledBrightnessToGpio(self, led_brightness):
 
-        binary = "{0:b}".format(int(led_brightness)//10)
-        if len(binary)!=4: binary = (4-len(binary))*'0'+binary
+        binary = "{0:b}".format(int(led_brightness) // 10)
+        if len(binary) != 4: binary = (4 - len(binary)) * '0' + binary
         return binary
 
+    def log(self, s):
+        if self.DEBUG:
+            print(s)
+
+
 if __name__ == '__main__':
-    l=[8,2,3,4,5]
-    lux_sensor={'lux_sensor_value':'50'}
-    
-   
+    l = [8, 2, 3, 4, 5]
+
     client = Client()
+
+    if len(sys.argv) > 1 and sys.argv[1] == "Debug":
+        client.DEBUG = True
+
     signal = client.showReceivedLEDSignal()
 
-    print('Printing Signal Received From the Server: %s'%signal)
+    client.log('Printing Signal Received From the Server: %s' % signal)
 
     client.sendLuxSensorValue()
-    # client.setGPIO(signal)
+    client.log("Signal: %s" % signal)
+    client.setGPIO(signal)
 
     # binary = client.ledBrightnessToGpio(signal)
     # print(binary)
@@ -85,5 +131,3 @@ if __name__ == '__main__':
     # response = requests.post('http://0.0.0.0:5000/', lux_sensor)
     # assert response.status_code == 200
     # print(response.text)
-
-    
