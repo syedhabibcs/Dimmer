@@ -69,8 +69,8 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
     
-    // http_url = 'http://140.193.217.63:5000/signal/'
-    http_url = 'http://192.168.0.17:5000/signal/'
+    http_url = 'http://140.193.219.234:5000/signal/'
+    // http_url = 'http://192.168.0.17:5000/signal/'
     
 
     var slider = document.getElementById("myRange");
@@ -98,15 +98,16 @@
     $(function poll(){
         var $flux_value = $('#lux');
         setTimeout(function(){
-            $.ajax({ type: 'GET', url: 'http://192.168.0.17:5000/flux/', success: function(flux_value){
+            $.ajax({ type: 'GET', url: 'http://140.193.219.234:5000/flux/', success: function(flux_value){
                 //Update flux value
-                 $flux_value.text(flux_value['lux_value']); 
+                 $flux_value.text(flux_value['lux_value']);
+                //  $flux_value.text(i); 
                 i = i+1;
                 console.log(i);
                 //Setup the next poll recursively
                 poll();
             }, dataType: "json"});
-        }, 2000);
+        }, 1000);
     });
     
 </script>

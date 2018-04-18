@@ -7,7 +7,7 @@ class Server:
 
     # This will be set from the user input from the web client
     lux_svalue = 0
-    led_brightness = 0
+    led_brightness = 50
 
     def run(self):
         app = Flask(__name__)
