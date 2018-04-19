@@ -11,7 +11,10 @@ class Server:
     lux_svalue = 0
     led_brightness = 50
 
-    chart_seconds = [(0,0)]
+    led_brightness_controller = False #false means manual meaning controlled by slider and True means scheduling
+
+    action=[]
+
 
     def run(self):
         app = Flask(__name__)
@@ -25,9 +28,7 @@ class Server:
             if request.method == "POST":
                 # printing the lux sensor value received from the post request
                 Server.lux_svalue = request.form['lux_sensor_value']
-                # Server.chart_seconds = (int(time.time()), Server.lux_svalue)
-                print(request)
-                print("Printing the lux sensor value received from Client: %s"%Server.lux_svalue)
+                # print("Printing the lux sensor value received from Client: %s"%Server.lux_svalue)
             return str(Server.led_brightness)
             
 
@@ -36,54 +37,80 @@ class Server:
             if request.method == "POST":
                 for field in request.form.keys():
                     value = request.form[field]
-                    self.setLedBrightness(value)
-                    print(value)
+                    if (Server.led_brightness_controller)==False:
+                        self.setLedBrightness(value)
+                        print(value)
             return render_template("main.html")
 
         @app.route("/flux/",methods = ["GET","POST"])
         def getFluxValue():
             return json.dumps({'lux_value': str(Server.lux_svalue)})
 
+        @app.route("/action/",methods = ["GET","POST"])
+        def registerAction():
+            if request.method == "POST":
+                
+                time = request.form['time']
+                unixTime = self.stringtoUnixTime(time)
+                intensity = str(int(request.form['intensity'])*10)
+                radio = request.form['radio']
+                
+                #
+                Server.led_brightness_controller = radio
+                if Server.led_brightness_controller:
+                    Server.action.append((str(unixTime),intensity))
+                    print(time)
+                    print(str(unixTime))
+                    Server.action = sorted(Server.action, key=lambda tup: (tup[0]))
+                    print(Server.action)
+            return "Test"
+
+        @app.route("/schedules/",methods = ["GET","POST"])
+        def getSchedules():
+            return json.dumps(dict(Server.action))
+            # return Server.action
+
+
+
         @app.route("/chart/",methods = ["GET","POST"])
         def getChartValue():
-            # Server.chart_seconds.append((1,2))
-            # Server.chart_seconds.append((3,4))
             time_lux = ((int(time.time()), Server.lux_svalue))
             chart_dic={'seconds': time_lux}
             return json.dumps(chart_dic)
+            
 
-    # def createChartValueSeconds(self):
-    #     for i in range(0,12):
-    #         # Server.chart_seconds.append((datetime.now().strftime('%H:%M:%S'), Server.lux_svalue))
-    #         Server.chart_seconds.append((int(time.time()), Server.lux_svalue))
-    #         time.sleep(5)
-    #     while True:
-    #         Server.chart_seconds.pop(0)
-    #         Server.chart_seconds.append((int(time.time()), Server.lux_svalue))
-    #         time.sleep(5)
+    def stringtoUnixTime(self, string_time):
+        addedYMD = time.strftime("%Y")+"-"+time.strftime("%m")+"-"+time.strftime("%d")+" "+string_time
+        dt = datetime.strptime(addedYMD, "%Y-%m-%d %H:%M:%S")
+        unixTime = time.mktime(dt.timetuple())
+        return str(int(unixTime))
 
 
     def setLedBrightness(self, led_brightness):
             Server.led_brightness = led_brightness
 
+    def sendScheduledSignals(self):
+        
+        timeToCompare = ""
+        while True:
+            if Server.led_brightness_controller:
+                print("Server time to send: "+str(Server.led_brightness))
+                string_time = str(int(time.time()))
+                if len(Server.action)>0:
+                    timeToCompare = Server.action[0]
+                    print("Action Time:"+timeToCompare[0] +"    |    System Time:"+string_time+"    |  Server Time To Send: "+str(Server.led_brightness))
+                    if string_time == timeToCompare[0]:
+                        Server.led_brightness = timeToCompare[1]
+                        Server.action.pop(0)
+                time.sleep(1)
+
 if __name__ == '__main__':
     server = Server()
     app =  server.run()
     server.routes()
-    # thread = threading.Thread(target=server.createChartValueSeconds, args=())
-    # thread.daemon = True                            # Daemonize thread
-    # thread.start()
+    thread = threading.Thread(target=server.sendScheduledSignals, args=())
+    thread.daemon = True                            # Daemonize thread
+    thread.start()
     app.run(debug=True, host='0.0.0.0')
 
 
-
-
-#Extra reference code
-
-# return json.dumps({'1':'Hello world'})
-
-# This route returns the html page instead of returning the json value
-        # @app.route('/',methods = ["GET","POST"])
-        # def index():
-        #     print(request)
-        #     return render_template("main.html")

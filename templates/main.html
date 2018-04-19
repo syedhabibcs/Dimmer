@@ -50,6 +50,8 @@
             font-size: 50px;
             text-align: center;
         }
+
+       
     </style>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='epoch.min.css') }}">
 </head>
@@ -70,6 +72,35 @@
 
         <div id='lux' class="lux_display"></div>
 
+        <div>
+            <p>Create Action:            
+                <p>
+                    Time:<input type="time" id="myTime" step="10"> 
+                    Intensity/Brightness:<select id="intensity">
+                        <option value="0">0 %</option>
+                        <option value="1">10 %</option>
+                        <option value="2">20 %</option>
+                        <option value="3">30 %</option>
+                        <option value="4">40 %</option>
+                        <option value="5">50 %</option>
+                        <option value="6">60 %</option>
+                        <option value="7">70 %</option>
+                        <option value="8">80 %</option>
+                        <option value="9">90 %</option>
+                        <option value="10">100 %</option>
+
+                    </select>
+                    <button onclick="scheduling()">Add Action</button>
+                </p>
+                <p>Scheduling Type:
+                    <form action="">
+                        <input type="radio" id="r1" checked="checked" name="schedule_type" value="manual"> Manual<br>
+                        <input type="radio" id="r2" name="schedule_type" value="automatic"> Automatic<br>
+                    </form>
+                </p>
+            </p>
+        </div>
+
     </div>
     <div id="lineChart" style="width: 800px; height: 200px"></div>
 
@@ -78,7 +109,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='epoch.min.js') }}"></script>
     <script>
 
-        http_url = 'http://140.193.219.234:5000/signal/'
+        http_url = 'http://140.193.91.230:5000/signal/'
 
 
         var slider = document.getElementById("myRange");
@@ -102,12 +133,57 @@
 
         }
 
+        xhr = new XMLHttpRequest();
+        var schedule_data = new FormData();
+        //scheduling:
+        function scheduling(){
+            var dict ={};
+            var time_input = document.getElementById("myTime").value;
+            if( (time_input.split(":")).length==2){
+                time_input = time_input.concat(":00");
+            }
+
+            console.log(time_input)
+            // dict['time']=time_input.value;
+            var intensity = document.getElementById("intensity").selectedIndex;
+            // dict['intensity']=intensity;
+            var radio = document.getElementById("r2").checked;
+            // dict['radio']=radio;
+        
+            
+            xhr.open('POST', 'http://140.193.91.230:5000/action/', true);
+            schedule_data.append('time',time_input);
+            schedule_data.append('intensity',intensity);
+            schedule_data.append('radio',radio);
+            
+            xhr.send(schedule_data);
+            schedule_data.delete('time')
+            schedule_data.delete('intensity')
+            schedule_data.delete('radio')
+            // $.get('http://192.168.0.17:5000/schedules/', function(data, status){
+            // // console.log(jQuery.type(data))
+            // console.log(data);
+            // console.log(jQuery.type(data));
+
+            xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    jsonDict = JSON.parse(this.responseText)
+                    console.log(jsonDict);
+                    console.log(typeof (jsonDict));
+                }
+            };
+            xhttp.open("GET", 'http://140.193.91.230:5000/schedules/', true);
+            xhttp.send();
+  
+        }
+
         // var i=2;
         $(function poll() {
             var $flux_value = $('#lux');
             setTimeout(function () {
                 $.ajax({
-                    type: 'GET', url: 'http://140.193.219.234:5000/flux/', success: function (flux_value) {
+                    type: 'GET', url: 'http://140.193.91.230:5000/flux/', success: function (flux_value) {
                         //Update flux value
                         $flux_value.text(flux_value['lux_value']);
                         //  $flux_value.text(i); 
@@ -120,12 +196,12 @@
             }, 1000);
         });
 
-        $.get('http://140.193.219.234:5000/chart/', function(data, status){
-            // console.log(jQuery.type(data))
-            console.log(data['seconds'])
-            console.log(data['seconds'][0])
-            console.log(data['seconds'][1])
-        }, "json");
+        // $.get('http://192.168.0.17:5000/schedules/', function(data, status){
+        //     // console.log(jQuery.type(data))
+        //     console.log(data);
+        //     console.log(jQuery.type(data));
+        // });    
+        // }, "json");
 
         var lineChartData = [
             { label: 'Layer 1', values: [] },
@@ -141,7 +217,7 @@
         $(function pollChart() {
             setTimeout(function () {
                 $.ajax({
-                    type: 'GET', url: 'http://140.193.219.234:5000/chart/', success: function (data) {
+                    type: 'GET', url: 'http://140.193.91.230:5000/chart/', success: function (data) {
                         //Update flux value
 
                         var newBarChartData = [{ time: data['seconds'][0][0], y: data['seconds'][0][1] }];
