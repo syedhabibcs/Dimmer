@@ -77,7 +77,7 @@ class Server:
         @app.route("/chart/",methods = ["GET","POST"])
         def getChartValue():
             time_lux = ((int(time.time()), Server.lux_svalue))
-            chart_dic={'seconds': time_lux}
+            chart_dic={'seconds': time_lux, 'led_brightness': Server.led_brightness}
             return json.dumps(chart_dic)
             
 

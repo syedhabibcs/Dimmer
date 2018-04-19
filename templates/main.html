@@ -52,7 +52,7 @@
                     <div id="slider" class="sliderCss noUi-connect"></div>
                 </div>
                 <div class="col-sm-*">
-                    <input id="input-format" class="inputBar" type="number">
+                    <input id="input-format" class="inputBar" type="number" step="10">
                 </div>
             </div>
         </div>
@@ -65,7 +65,6 @@
 
     <div id="lineChart" class="epoch" style="width: 1200px; height: 400px"></div>
 
-<<<<<<< HEAD
         <div>
             <p>Create Action:            
                 <p>
@@ -97,8 +96,6 @@
 
     </div>
     <div id="lineChart" style="width: 800px; height: 200px"></div>
-=======
->>>>>>> 063da86adb80ddc1681e0e6f1782fa973d593334
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v3.min.js"></script>
@@ -109,11 +106,7 @@
 
     <script>
 
-<<<<<<< HEAD
-        http_url = 'http://140.193.91.230:5000/signal/'
-=======
-        http_url = 'http://140.193.207.68:5000/'
->>>>>>> 063da86adb80ddc1681e0e6f1782fa973d593334
+        http_url = 'http://140.193.91.230:5000/'
 
         var xhr = new XMLHttpRequest();
         var data = new FormData();
@@ -163,7 +156,6 @@
         //Lux Value-----------------------------------------------------//
         //--------------------------------------------------------------//
 
-<<<<<<< HEAD
         xhr = new XMLHttpRequest();
         var schedule_data = new FormData();
         //scheduling:
@@ -182,7 +174,7 @@
             // dict['radio']=radio;
         
             
-            xhr.open('POST', 'http://140.193.91.230:5000/action/', true);
+            xhr.open('POST', http_url.concat("action/"), true);
             schedule_data.append('time',time_input);
             schedule_data.append('intensity',intensity);
             schedule_data.append('radio',radio);
@@ -204,48 +196,27 @@
                     console.log(typeof (jsonDict));
                 }
             };
-            xhttp.open("GET", 'http://140.193.91.230:5000/schedules/', true);
+            xhttp.open("GET", http_url.concat("schedules/"), true);
             xhttp.send();
   
         }
 
         // var i=2;
-=======
->>>>>>> 063da86adb80ddc1681e0e6f1782fa973d593334
         $(function poll() {
             var $meter_lux_value = $('#odometer');
             setTimeout(function () {
                 $.ajax({
-<<<<<<< HEAD
-                    type: 'GET', url: 'http://140.193.91.230:5000/flux/', success: function (flux_value) {
-                        //Update flux value
-                        $flux_value.text(flux_value['lux_value']);
-                        //  $flux_value.text(i); 
-                        // i = i+1;
-                        // console.log(i);
-                        //Setup the next poll recursively
-=======
                     type: 'GET', url: http_url.concat("flux/"), success: function (server_lux_value) {
                         $meter_lux_value.text(server_lux_value['lux_value']);
->>>>>>> 063da86adb80ddc1681e0e6f1782fa973d593334
                         poll();
                     }, dataType: "json"
                 });
             }, 1000);
         });
 
-<<<<<<< HEAD
-        // $.get('http://192.168.0.17:5000/schedules/', function(data, status){
-        //     // console.log(jQuery.type(data))
-        //     console.log(data);
-        //     console.log(jQuery.type(data));
-        // });    
-        // }, "json");
-=======
         //--------------------------------------------------------------//
         //Lux Chart-----------------------------------------------------//
         //--------------------------------------------------------------//
->>>>>>> 063da86adb80ddc1681e0e6f1782fa973d593334
 
         var lineChartData = [
             { label: 'Series 1', values: [], range: 'range-l' }
@@ -268,19 +239,11 @@
         $(function pollChart() {
             setTimeout(function () {
                 $.ajax({
-<<<<<<< HEAD
-                    type: 'GET', url: 'http://140.193.91.230:5000/chart/', success: function (data) {
-                        //Update flux value
-
-                        var newBarChartData = [{ time: data['seconds'][0][0], y: data['seconds'][0][1] }];
-                        //var newBarChartData = [{time: data['seconds'][0][0], y: i2}];
-                        i2 = i2 + 1;
-=======
                     type: 'GET', url: http_url.concat('chart/'), success: function (data) {
                         //Update flux value                        
                         var newBarChartData = [{ time: data['seconds'][0], y: data['seconds'][1] }];
->>>>>>> 063da86adb80ddc1681e0e6f1782fa973d593334
                         myChart.push(newBarChartData);
+                        console.log(data['led_brightness']);
                         pollChart();
                     }, dataType: "json"
                 });
