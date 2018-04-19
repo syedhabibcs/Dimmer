@@ -78,7 +78,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='epoch.min.js') }}"></script>
     <script>
 
-        http_url = 'http://140.193.207.68:5000/signal/'
+        http_url = 'http://140.193.219.234:5000/signal/'
 
 
         var slider = document.getElementById("myRange");
@@ -107,7 +107,7 @@
             var $flux_value = $('#lux');
             setTimeout(function () {
                 $.ajax({
-                    type: 'GET', url: 'http://140.193.207.68:5000/flux/', success: function (flux_value) {
+                    type: 'GET', url: 'http://140.193.219.234:5000/flux/', success: function (flux_value) {
                         //Update flux value
                         $flux_value.text(flux_value['lux_value']);
                         //  $flux_value.text(i); 
@@ -120,11 +120,12 @@
             }, 1000);
         });
 
-        // $.get('http://192.168.0.15:5000/chart/', function(data, status){
-        //     console.log(jQuery.type(data))
-        //     console.log(data['seconds'])
-        //     console.log(data['seconds'][1][1])
-        // }, "json");
+        $.get('http://140.193.219.234:5000/chart/', function(data, status){
+            // console.log(jQuery.type(data))
+            console.log(data['seconds'])
+            console.log(data['seconds'][0])
+            console.log(data['seconds'][1])
+        }, "json");
 
         var lineChartData = [
             { label: 'Layer 1', values: [] },
@@ -140,7 +141,7 @@
         $(function pollChart() {
             setTimeout(function () {
                 $.ajax({
-                    type: 'GET', url: 'http://140.193.207.68:5000/chart/', success: function (data) {
+                    type: 'GET', url: 'http://140.193.219.234:5000/chart/', success: function (data) {
                         //Update flux value
 
                         var newBarChartData = [{ time: data['seconds'][0][0], y: data['seconds'][0][1] }];
