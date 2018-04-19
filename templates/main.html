@@ -6,55 +6,82 @@
     <style>
         .sliderCss {
             height: 200px;
+            width: 0px;
         }
 
         #red .noUi-connect {
             background: #c0392b;
         }
 
-        .lux_display {
-            width: 320px;
+        .inputBar {
+            font-size: 25px;
+            text-align: center;
+            width: 5%;
+        }
+
+        .inputBar[type=number]:focus {
+            /* background-color: #3CBC8D; */
+            /* color: white; */
+            border: 3px solid rgb(29, 133, 151);
+        }
+
+        .odometer {
             padding: 10px;
-            border: 5px solid gray;
+            border: 5px solid rgb(216, 231, 12);
             margin: 0;
             font-size: 50px;
             text-align: center;
         }
     </style>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='odometer-theme-default.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='epoch.min.css') }}">
-    <link href="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.min.css" rel="stylesheet">
 </head>
 
 <body>
 
-    <h1>Light Brighness:</h1>
-    <div id="slider" class="sliderCss noUi-connect"></div>
-
-    <br></br>
-
-    <input id="input-format">
+    <div class="container">
+        <h1>Light Brighness:</h1>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-1">
+                    <div id="slider" class="sliderCss noUi-connect"></div>
+                </div>
+                <div class="col-sm-*">
+                    <input id="input-format" class="inputBar" type="number">
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="luxvalue">
         <h1>Lux Value:</h1>
-        <div id='lux' class="lux_display"></div>
+        <div id="odometer" format: '(,ddd).dd' class="odometer"></div>
     </div>
 
-    <br>
-    <br></br>
-    </br>
     <div id="lineChart" class="epoch" style="width: 1200px; height: 400px"></div>
 
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <script src="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='epoch.min.js') }}"></script>
+    <script src="http://github.hubspot.com/odometer/odometer.js"></script>
+
     <script>
 
-        http_url = 'http://140.193.207.68:5000/signal/'
+        http_url = 'http://140.193.207.68:5000/'
 
         var xhr = new XMLHttpRequest();
         var data = new FormData();
+
+
+        //--------------------------------------------------------------//
+        //Slider--------------------------------------------------------//
+        //--------------------------------------------------------------//
 
         var sliderFormat = document.getElementById('slider');
         noUiSlider.create(sliderFormat, {
@@ -86,29 +113,31 @@
 
         sliderFormat.noUiSlider.on('set', function (values, handle) {
             // console.log(values[handle]);
-            xhr.open('POST', http_url, true);
+            xhr.open('POST', http_url.concat("signal/"), true);
             data.append('led_value', values[handle]);
             xhr.send(data);
             data.delete('led_value')
         });
 
+        //--------------------------------------------------------------//
+        //Lux Value-----------------------------------------------------//
+        //--------------------------------------------------------------//
 
         $(function poll() {
-            var $flux_value = $('#lux');
+            var $meter_lux_value = $('#odometer');
             setTimeout(function () {
                 $.ajax({
-                    type: 'GET', url: 'http://140.193.207.68:5000/flux/', success: function (flux_value) {
-                        //Update flux value
-                        $flux_value.text(flux_value['lux_value']);
-                        //  $flux_value.text(i); 
-                        // i = i+1;
-                        // console.log(i);
-                        //Setup the next poll recursively
+                    type: 'GET', url: http_url.concat("flux/"), success: function (server_lux_value) {
+                        $meter_lux_value.text(server_lux_value['lux_value']);
                         poll();
                     }, dataType: "json"
                 });
             }, 1000);
         });
+
+        //--------------------------------------------------------------//
+        //Lux Chart-----------------------------------------------------//
+        //--------------------------------------------------------------//
 
         var lineChartData = [
             { label: 'Series 1', values: [], range: 'range-l' }
@@ -131,7 +160,7 @@
         $(function pollChart() {
             setTimeout(function () {
                 $.ajax({
-                    type: 'GET', url: 'http://140.193.207.68:5000/chart/', success: function (data) {
+                    type: 'GET', url: http_url.concat('chart/'), success: function (data) {
                         //Update flux value                        
                         var newBarChartData = [{ time: data['seconds'][0], y: data['seconds'][1] }];
                         myChart.push(newBarChartData);
