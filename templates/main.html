@@ -4,48 +4,30 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        .slidecontainer {
-            width: 100%;
+        .sliderCss {
+            height: 200px;
+            width: 0px;
         }
 
-        .slider {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 15px;
-            border-radius: 5px;
-            background: #d3d3d3;
-            outline: none;
-            opacity: 0.7;
-            -webkit-transition: .2s;
-            transition: opacity .2s;
+        #red .noUi-connect {
+            background: #c0392b;
         }
 
-        .slider:hover {
-            opacity: 1;
+        .inputBar {
+            font-size: 25px;
+            text-align: center;
+            width: 5%;
         }
 
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: #4CAF50;
-            cursor: pointer;
+        .inputBar[type=number]:focus {
+            /* background-color: #3CBC8D; */
+            /* color: white; */
+            border: 3px solid rgb(29, 133, 151);
         }
 
-        .slider::-moz-range-thumb {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: #4CAF50;
-            cursor: pointer;
-        }
-
-        .lux_display {
-            width: 320px;
+        .odometer {
             padding: 10px;
-            border: 5px solid gray;
+            border: 5px solid rgb(216, 231, 12);
             margin: 0;
             font-size: 50px;
             text-align: center;
@@ -53,25 +35,37 @@
 
        
     </style>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='odometer-theme-default.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='epoch.min.css') }}">
 </head>
 
 <body>
 
-    <h1>Light Brighness:</h1>
-
-    <div class="" "slidecontainer">
-        <input type="range" min="0" max="100" value="50" class="slider" id="myRange" step=10>
-
-        <p>Value:
-            <span id="demo"></span>
-        </p>
+    <div class="container">
+        <h1>Light Brighness:</h1>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-1">
+                    <div id="slider" class="sliderCss noUi-connect"></div>
+                </div>
+                <div class="col-sm-*">
+                    <input id="input-format" class="inputBar" type="number">
+                </div>
+            </div>
+        </div>
     </div>
+
     <div class="luxvalue">
         <h1>Lux Value:</h1>
+        <div id="odometer" format: '(,ddd).dd' class="odometer"></div>
+    </div>
 
-        <div id='lux' class="lux_display"></div>
+    <div id="lineChart" class="epoch" style="width: 1200px; height: 400px"></div>
 
+<<<<<<< HEAD
         <div>
             <p>Create Action:            
                 <p>
@@ -103,36 +97,73 @@
 
     </div>
     <div id="lineChart" style="width: 800px; height: 200px"></div>
+=======
+>>>>>>> 063da86adb80ddc1681e0e6f1782fa973d593334
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='epoch.min.js') }}"></script>
+    <script src="http://github.hubspot.com/odometer/odometer.js"></script>
+
     <script>
 
+<<<<<<< HEAD
         http_url = 'http://140.193.91.230:5000/signal/'
-
-
-        var slider = document.getElementById("myRange");
-        var output = document.getElementById("demo");
-        output.innerHTML = slider.value;
+=======
+        http_url = 'http://140.193.207.68:5000/'
+>>>>>>> 063da86adb80ddc1681e0e6f1782fa973d593334
 
         var xhr = new XMLHttpRequest();
-
         var data = new FormData();
-        xhr.onload = function () {
-            console.log(this.responseText);
-        };
 
 
-        slider.oninput = function () {
-            output.innerHTML = this.value;
-            xhr.open('POST', http_url, true);
-            data.append('led_value', slider.value);
+        //--------------------------------------------------------------//
+        //Slider--------------------------------------------------------//
+        //--------------------------------------------------------------//
+
+        var sliderFormat = document.getElementById('slider');
+        noUiSlider.create(sliderFormat, {
+            start: 20,
+            step: 10,
+            orientation: 'vertical',
+            range: {
+                'min': 0,
+                'max': 100
+            },
+            format: {
+                to: function (value) {
+                    return value;
+                },
+                from: function (value) {
+                    return value;
+                }
+            }
+        });
+
+        var inputFormat = document.getElementById('input-format');
+        inputFormat.addEventListener('change', function () {
+            sliderFormat.noUiSlider.set(this.value);
+        });
+
+        sliderFormat.noUiSlider.on('update', function (values, handle) {
+            inputFormat.value = values[handle];
+        });
+
+        sliderFormat.noUiSlider.on('set', function (values, handle) {
+            // console.log(values[handle]);
+            xhr.open('POST', http_url.concat("signal/"), true);
+            data.append('led_value', values[handle]);
             xhr.send(data);
             data.delete('led_value')
+        });
 
-        }
+        //--------------------------------------------------------------//
+        //Lux Value-----------------------------------------------------//
+        //--------------------------------------------------------------//
 
+<<<<<<< HEAD
         xhr = new XMLHttpRequest();
         var schedule_data = new FormData();
         //scheduling:
@@ -179,10 +210,13 @@
         }
 
         // var i=2;
+=======
+>>>>>>> 063da86adb80ddc1681e0e6f1782fa973d593334
         $(function poll() {
-            var $flux_value = $('#lux');
+            var $meter_lux_value = $('#odometer');
             setTimeout(function () {
                 $.ajax({
+<<<<<<< HEAD
                     type: 'GET', url: 'http://140.193.91.230:5000/flux/', success: function (flux_value) {
                         //Update flux value
                         $flux_value.text(flux_value['lux_value']);
@@ -190,51 +224,70 @@
                         // i = i+1;
                         // console.log(i);
                         //Setup the next poll recursively
+=======
+                    type: 'GET', url: http_url.concat("flux/"), success: function (server_lux_value) {
+                        $meter_lux_value.text(server_lux_value['lux_value']);
+>>>>>>> 063da86adb80ddc1681e0e6f1782fa973d593334
                         poll();
                     }, dataType: "json"
                 });
             }, 1000);
         });
 
+<<<<<<< HEAD
         // $.get('http://192.168.0.17:5000/schedules/', function(data, status){
         //     // console.log(jQuery.type(data))
         //     console.log(data);
         //     console.log(jQuery.type(data));
         // });    
         // }, "json");
+=======
+        //--------------------------------------------------------------//
+        //Lux Chart-----------------------------------------------------//
+        //--------------------------------------------------------------//
+>>>>>>> 063da86adb80ddc1681e0e6f1782fa973d593334
 
         var lineChartData = [
-            { label: 'Layer 1', values: [] },
+            { label: 'Series 1', values: [], range: 'range-l' }
         ];
-
 
         var myChart = $('#lineChart').epoch({
             type: 'time.line',
-            data: lineChartData
+            data: lineChartData,
+            range: {
+                left: 'range-l',
+                right: [0, 100]
+            },
+            axes: ['bottom', 'left'],
+            // ticks: { time: 30 },
+            // windowSize: 180,
+            ticks: { time: 5 },
+            windowSize: 30,
         });
 
-        var i2 = 1;
         $(function pollChart() {
             setTimeout(function () {
                 $.ajax({
+<<<<<<< HEAD
                     type: 'GET', url: 'http://140.193.91.230:5000/chart/', success: function (data) {
                         //Update flux value
 
                         var newBarChartData = [{ time: data['seconds'][0][0], y: data['seconds'][0][1] }];
                         //var newBarChartData = [{time: data['seconds'][0][0], y: i2}];
                         i2 = i2 + 1;
+=======
+                    type: 'GET', url: http_url.concat('chart/'), success: function (data) {
+                        //Update flux value                        
+                        var newBarChartData = [{ time: data['seconds'][0], y: data['seconds'][1] }];
+>>>>>>> 063da86adb80ddc1681e0e6f1782fa973d593334
                         myChart.push(newBarChartData);
-
                         pollChart();
                     }, dataType: "json"
                 });
-            }, 5000);
+            }, 1000);
         });
 
-
-
     </script>
-
 </body>
 
 </html>
