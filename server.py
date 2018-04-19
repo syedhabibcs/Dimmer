@@ -26,8 +26,8 @@ class Server:
                 # printing the lux sensor value received from the post request
                 Server.lux_svalue = request.form['lux_sensor_value']
                 # Server.chart_seconds = (int(time.time()), Server.lux_svalue)
-                print(request)
-                print("Printing the lux sensor value received from Client: %s"%Server.lux_svalue)
+                # print(request)
+                # print("Printing the lux sensor value received from Client: %s"%Server.lux_svalue)
             return str(Server.led_brightness)
             
 
