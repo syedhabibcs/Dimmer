@@ -11,7 +11,7 @@ class Server:
     lux_svalue = 0
     led_brightness = 50
 
-    chart_seconds = []
+    chart_seconds = [(0,0)]
 
     def run(self):
         app = Flask(__name__)
@@ -25,6 +25,7 @@ class Server:
             if request.method == "POST":
                 # printing the lux sensor value received from the post request
                 Server.lux_svalue = request.form['lux_sensor_value']
+                # Server.chart_seconds = (int(time.time()), Server.lux_svalue)
                 print(request)
                 print("Printing the lux sensor value received from Client: %s"%Server.lux_svalue)
             return str(Server.led_brightness)
@@ -47,19 +48,19 @@ class Server:
         def getChartValue():
             # Server.chart_seconds.append((1,2))
             # Server.chart_seconds.append((3,4))
-
-            chart_dic = {'seconds': Server.chart_seconds}
+            time_lux = ((int(time.time()), Server.lux_svalue))
+            chart_dic={'seconds': time_lux}
             return json.dumps(chart_dic)
 
-    def createChartValueSeconds(self):
-        for i in range(0,12):
-            # Server.chart_seconds.append((datetime.now().strftime('%H:%M:%S'), Server.lux_svalue))
-            Server.chart_seconds.append((int(time.time()), Server.lux_svalue))
-            time.sleep(5)
-        while True:
-            Server.chart_seconds.pop(0)
-            Server.chart_seconds.append((int(time.time()), Server.lux_svalue))
-            time.sleep(5)
+    # def createChartValueSeconds(self):
+    #     for i in range(0,12):
+    #         # Server.chart_seconds.append((datetime.now().strftime('%H:%M:%S'), Server.lux_svalue))
+    #         Server.chart_seconds.append((int(time.time()), Server.lux_svalue))
+    #         time.sleep(5)
+    #     while True:
+    #         Server.chart_seconds.pop(0)
+    #         Server.chart_seconds.append((int(time.time()), Server.lux_svalue))
+    #         time.sleep(5)
 
 
     def setLedBrightness(self, led_brightness):
@@ -69,9 +70,9 @@ if __name__ == '__main__':
     server = Server()
     app =  server.run()
     server.routes()
-    thread = threading.Thread(target=server.createChartValueSeconds, args=())
-    thread.daemon = True                            # Daemonize thread
-    thread.start()
+    # thread = threading.Thread(target=server.createChartValueSeconds, args=())
+    # thread.daemon = True                            # Daemonize thread
+    # thread.start()
     app.run(debug=True, host='0.0.0.0')
 
 
