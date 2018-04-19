@@ -63,7 +63,8 @@
         <div id="odometer" format: '(,ddd).dd' class="odometer"></div>
     </div>
 
-    <div id="lineChart" class="epoch" style="width: 1200px; height: 400px"></div>
+    <div id="lineChart" class="epoch" style="width: 800px; height: 400px"></div>
+    <div id="intensityChart" class="epoch" style="width: 800px; height: 400px"></div>
 
         <div>
             <p>Create Action:            
@@ -183,10 +184,6 @@
             schedule_data.delete('time')
             schedule_data.delete('intensity')
             schedule_data.delete('radio')
-            // $.get('http://192.168.0.17:5000/schedules/', function(data, status){
-            // // console.log(jQuery.type(data))
-            // console.log(data);
-            // console.log(jQuery.type(data));
 
             xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function() {
@@ -219,30 +216,46 @@
         //--------------------------------------------------------------//
 
         var lineChartData = [
-            { label: 'Series 1', values: [], range: 'range-l' }
+            { label: 'Series 1', values: [], range: [0, 500] }
         ];
 
         var myChart = $('#lineChart').epoch({
             type: 'time.line',
             data: lineChartData,
             range: {
-                left: 'range-l',
-                right: [0, 100]
+                left: [0, 500]
             },
             axes: ['bottom', 'left'],
             // ticks: { time: 30 },
             // windowSize: 180,
-            ticks: { time: 5 },
+            ticks: { time: 5, left: 8 },
             windowSize: 30,
         });
+
+        var intensityChartData = [
+            { label: 'Series 1', values: [], range: [0, 500] }
+        ];
+
+        var intensityChart = $('#intensityChart').epoch({
+            type: 'time.line',
+            data: intensityChartData,
+            range: {
+                left: [0, 100]
+            },
+            axes: ['bottom', 'left'],
+            // ticks: { time: 30 },
+            // windowSize: 180,
+            ticks: { time: 5, left: 10 },
+            windowSize: 30,
+        });
+        
 
         $(function pollChart() {
             setTimeout(function () {
                 $.ajax({
                     type: 'GET', url: http_url.concat('chart/'), success: function (data) {
                         //Update flux value                        
-                        var newBarChartData = [{ time: data['seconds'][0], y: data['seconds'][1] }];
-                        myChart.push(newBarChartData);
+                        myChart.push([{ time: data['seconds'][0], y: data['seconds'][1] }]);
                         pollChart();
                     }, dataType: "json"
                 });
