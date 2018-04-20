@@ -105,7 +105,6 @@
             </div>
         </div>
         <br>
-        <br>
         <div class="row">
             <div class="col-md-6">
                 <div class="row">
@@ -117,7 +116,30 @@
                         <div class="action">
                             Time:
                             <input type="time" id="myTime" step="10">
-                            <button onclick="setCurrentTime()">Current Time</button>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    +Current Time
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" data-type=1 href="#">+20s</a>
+                                    <a class="dropdown-item" data-type=2 href="#">+30s</a>
+                                    <a class="dropdown-item" data-type=3 href="#">+40s</a>
+                                    <a class="dropdown-item" data-type=4 href="#">+50s</a>
+                                    <a class="dropdown-item" data-type=5 href="#">+60s</a>
+                                    <a class="dropdown-item" data-type=6 href="#">+70s</a>
+                                    <a class="dropdown-item" data-type=7 href="#">+80s</a>
+                                    <a class="dropdown-item" data-type=8 href="#">+90s</a>
+                                    <a class="dropdown-item" data-type=9 href="#">+100s</a>
+                                    <a class="dropdown-item" data-type=10 href="#">+110s</a>
+                                    <a class="dropdown-item" data-type=11 href="#">+120s</a>
+                                    <a class="dropdown-item" data-type=12 href="#">+130s</a>
+                                    <a class="dropdown-item" data-type=13 href="#">+140s</a>
+                                    <a class="dropdown-item" data-type=14 href="#">+150s</a>
+                                    <a class="dropdown-item" data-type=15 href="#">+160s</a>
+                                    <a class="dropdown-item" data-type=16 href="#">+170s</a>
+                                    <a class="dropdown-item" data-type=17 href="#">+180s</a>
+                                </div>
+                            </div>
                             Intensity/Brightness:
                             <select id="intensity">
                                 <option value="0">0 %</option>
@@ -361,16 +383,25 @@
             }, 1000);
         });
 
-        function setCurrentTime() {
+
+        $(".dropdown-menu a").click(function () {
+            var type = $(this).data("type");
+
             var time_input = document.getElementById("myTime");
-            var d = new Date(),
-                h = d.getHours(),
-                m = d.getMinutes();
+            var d = new Date();
+
+            d.setSeconds(d.getSeconds() + ((type + 1) * 10));
+            var h = d.getHours();
+            var m = d.getMinutes();
+            var s = d.getSeconds();
+
             if (h < 10) h = '0' + h;
             if (m < 10) m = '0' + m;
+            if (s < 10) s = '0' + s;
 
-            time_input.value = h + ':' + m
-        }
+            time_input.value = h + ':' + m + ':' + s;
+        });
+
     </script>
 </body>
 
