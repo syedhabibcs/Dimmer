@@ -27,14 +27,15 @@
 
         .odometer {
             padding: 10px;
-            border: 5px solid rgb(216, 231, 12);
+            border: 5px solid rgb(255, 102, 0);
             margin: 0;
-            font-size: 50px;
+            font-size: 100px;
             text-align: center;
         }
 
-        ul.b {
+        .showSchedule {
             list-style-type: square;
+            float: right;
         }
 
         #success {
@@ -44,6 +45,34 @@
         #failure {
             background: rgb(194, 67, 67);
             color: white;
+        }
+
+        .luxvalue {
+            float: left;
+            width: 54%;
+        }
+
+        .intensityChart {
+            float: left;
+            /* width: 20%; */
+        }
+
+        .lineChart_class {
+            float: right;
+        }
+
+
+
+        .auto_manual {
+            float: left;
+        }
+
+        .showSchedule {
+            /* float: right; */
+        }
+
+        .action {
+            /* float: left; */
         }
     </style>
 
@@ -55,6 +84,10 @@
 
 <body>
 
+    <div class="luxvalue">
+        <h1>Lux Value:</h1>
+        <div id="odometer" format: '(,ddd).dd' class="odometer"></div>
+    </div>
     <div class="container">
         <h1>Light Brighness:</h1>
         <div class="container">
@@ -69,20 +102,20 @@
         </div>
     </div>
 
-    <div class="luxvalue">
-        <h1>Lux Value:</h1>
-        <div id="odometer" format: '(,ddd).dd' class="odometer"></div>
+
+    <div class="intensityChart">
+        <h1>Intensity Graph</h1>
+        <div id="intensityChart" class="epoch" style="width: 800px; height: 400px"></div>
+    </div>
+    <!-- <br></br> -->
+
+    <div class="lineChart_class">
+        <h1>Lux Graph</h1>
+        <div id="lineChart" class="epoch" style="width: 800px; height: 400px"></div>
+        <br></br>
     </div>
 
-    <h1>Intensity Graph</h1>
-    <div id="intensityChart" class="epoch" style="width: 800px; height: 400px"></div>
-
-    <br></br>
-
-    <h1>Lux Graph</h1>
-    <div id="lineChart" class="epoch" style="width: 800px; height: 400px"></div>
-
-    <div>
+    <div class="action">
         <p>Create Action:
             <p>
                 Time:
@@ -107,22 +140,38 @@
                 <span id="success"></span>
                 <span id="failure"></span>
             </p>
-            <p>Scheduling Type:
-                <form action="">
-                    <input type="radio" id="r1" checked="checked" name="schedule_type" value="manual"> Manual
-                    <br>
-                    <input type="radio" id="r2" name="schedule_type" value="automatic"> Automatic
-                    <br>
-                </form>
-            </p>
+
         </p>
 
         </p>
     </div>
-
+    <div class="auto_manual">
+        <p>Scheduling Type:
+            <br>
+        </p>
+        <form action="">
+            <input type="radio" id="r1" checked="checked" name="schedule_type" value="manual"> Manual
+            <br>
+            <input type="radio" id="r2" name="schedule_type" value="automatic"> Automatic
+            <br>
+        </form>
+        </p>
     </div>
 
-    <ul id="scheduled_actions" class="b"></ul>
+
+    <div class="showSchedule_class">
+        <ul id="scheduled_actions" class="showSchedule"></ul>
+        <br></br>
+    </div>
+
+
+
+
+
+
+
+
+
 
     <!-- /////////////////////////////////////////////////////////////////////////////
     End of HTML///////////////////////////////////////////////////////////////////////
@@ -138,7 +187,7 @@
 
     <script>
 
-        http_url = 'http://140.193.207.68:5000/'
+        http_url = 'http://140.193.91.230:5000/'
 
         var xhr = new XMLHttpRequest();
         var data = new FormData();
