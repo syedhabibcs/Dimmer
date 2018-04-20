@@ -27,10 +27,7 @@ class Server:
         @app.route('/',methods = ["GET","POST"])
         def index():
             if request.method == "POST":
-                # printing the lux sensor value received from the post request
                 Server.lux_svalue = request.form['lux_sensor_value']
-                # Server.chart_seconds = (int(time.time()), Server.lux_svalue)
-                # print(request)
                 # print("Printing the lux sensor value received from Client: %s"%Server.lux_svalue)
             return str(Server.led_brightness)
             
@@ -41,10 +38,7 @@ class Server:
                 for field in request.form.keys():
                     value = request.form[field]
                     Server.led_brightness_controller=False
-                    self.setLedBrightness(value)
-                    # if (Server.led_brightness_controller)==False:
-                        
-                    print(value)
+                    self.setLedBrightness(value)                        
             return render_template("main.html")
 
         @app.route("/flux/",methods = ["GET","POST"])
@@ -73,7 +67,6 @@ class Server:
                         action_temp[unixTime] = intensity
                         Server.action = [(k,v) for (k,v) in action_temp.items()]
 
-                        # Server.action.append((str(unixTime),intensity))
                         Server.isActionValid = True
                         print(user_time)
                         print(str(unixTime))
@@ -88,9 +81,6 @@ class Server:
             action_dict = dict(Server.action)
             action_dict['valid']= Server.isActionValid
             return json.dumps(action_dict)
-            # return Server.action
-
-
 
         @app.route("/chart/",methods = ["GET","POST"])
         def getChartValue():
@@ -98,7 +88,6 @@ class Server:
             chart_dic={'seconds': time_lux, 'led_brightness': Server.led_brightness}
             return json.dumps(chart_dic)
             
-
     def stringtoUnixTime(self, string_time):
         addedYMD = time.strftime("%Y")+"-"+time.strftime("%m")+"-"+time.strftime("%d")+" "+string_time
         dt = datetime.strptime(addedYMD, "%Y-%m-%d %H:%M:%S")
@@ -114,11 +103,9 @@ class Server:
         timeToCompare = ""
         while True:
             if Server.led_brightness_controller:
-                #print("Server time to send: "+str(Server.led_brightness))
                 string_time = str(int(time.time()))
                 if len(Server.action)>0:
                     timeToCompare = Server.action[0]
-                    #print("Action Time:"+timeToCompare[0] +"    |    System Time:"+string_time+"    |  Server Time To Send: "+str(Server.led_brightness))
                     if string_time >= timeToCompare[0]:
                         Server.led_brightness = timeToCompare[1]
                         Server.action.pop(0)

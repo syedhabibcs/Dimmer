@@ -54,11 +54,9 @@
 
         .intensityChart {
             float: left;
-            /* width: 20%; */
         }
 
         .lineChart_class {
-            /* float: right; */
             float: left;
         }
 
@@ -76,7 +74,6 @@
 
         .action {
             float: left;
-            /* width: 60%; */
         }
     </style>
 
@@ -111,7 +108,6 @@
         <h1>Intensity Graph</h1>
         <div id="intensityChart" class="epoch" style="width: 800px; height: 400px"></div>
     </div>
-    <!-- <br></br> -->
 
     <div class="lineChart_class">
         <h1>Lux Graph</h1>
@@ -238,7 +234,7 @@
         });
 
         sliderFormat.noUiSlider.on('set', function (values, handle) {
-            // console.log(values[handle]);
+            
             var radio = document.getElementById("r1");
             radio.checked=true;
             xhr.open('POST', http_url.concat("signal/"), true);
