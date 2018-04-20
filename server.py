@@ -40,9 +40,11 @@ class Server:
             if request.method == "POST":
                 for field in request.form.keys():
                     value = request.form[field]
-                    if (Server.led_brightness_controller)==False:
-                        self.setLedBrightness(value)
-                        #print(value)
+                    Server.led_brightness_controller=False
+                    self.setLedBrightness(value)
+                    # if (Server.led_brightness_controller)==False:
+                        
+                    print(value)
             return render_template("main.html")
 
         @app.route("/flux/",methods = ["GET","POST"])
