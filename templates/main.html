@@ -36,6 +36,14 @@
         ul.b {
             list-style-type: square;
         }
+
+        #success {
+            background: #CCF5CC;
+        }
+
+        #failure {
+            background: red;
+        }
     </style>
 
     <link rel="stylesheet" href="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.min.css">
@@ -95,8 +103,9 @@
 
                 </select>
                 <button onclick="scheduling()">Add Action</button>
+                <span id="success"></span>
+                <span id="failure"></span>
             </p>
-
             <p>Scheduling Type:
                 <form action="">
                     <input type="radio" id="r1" checked="checked" name="schedule_type" value="manual"> Manual
@@ -105,6 +114,8 @@
                     <br>
                 </form>
             </p>
+        </p>
+
         </p>
     </div>
 
@@ -188,17 +199,15 @@
             }
 
             console.log(time_input)
-            // dict['time']=time_input.value;
             var intensity = document.getElementById("intensity").selectedIndex;
-            // dict['intensity']=intensity;
-            var radio = document.getElementById("r2").checked;
-            // dict['radio']=radio;
+            var radio = document.getElementById("r2");
+            radio.checked = true;
 
 
             xhr.open('POST', http_url.concat("action/"), true);
-            schedule_data.append('time', time_input);
-            schedule_data.append('intensity', intensity);
-            schedule_data.append('radio', radio);
+            schedule_data.append('time',time_input);
+            schedule_data.append('intensity',intensity);
+            schedule_data.append('radio',radio.checked);
 
             xhr.send(schedule_data);
             schedule_data.delete('time')
@@ -209,6 +218,20 @@
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
                     jsonDict = JSON.parse(this.responseText)
+                    var isValid = jsonDict['valid'];
+                    if (isValid) {
+
+                        $('#success').fadeIn();
+                        $('#success').text("Action created successfully!");
+                        $('#success').fadeOut(3000);
+                        // setTimeout(function(){$('#success').fadeIn();}, 10000);
+                    }
+                    else {
+                        $('#failure').fadeIn();
+                        $('#failure').text("Not a valid action!");
+                        $('#failure').fadeOut(3000);
+                    }
+                    console.log(isValid)
                     console.log(jsonDict);
                     console.log(typeof (jsonDict));
 

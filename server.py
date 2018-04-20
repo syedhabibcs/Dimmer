@@ -13,6 +13,7 @@ class Server:
 
     led_brightness_controller = False #false means manual meaning controlled by slider and True means scheduling
 
+    isActionValid = True
     action=[]
 
 
@@ -52,24 +53,39 @@ class Server:
         def registerAction():
             if request.method == "POST":
                 
-                time = request.form['time']
-                unixTime = self.stringtoUnixTime(time)
+                user_time = request.form['time']
+                unixTime = self.stringtoUnixTime(user_time)
                 intensity = str(int(request.form['intensity'])*10)
                 radio = request.form['radio']
                 
                 #
-                Server.led_brightness_controller = radio
+                if radio == 'true':
+                    Server.led_brightness_controller = True
+
+                print("Controller: %r" % Server.led_brightness_controller)
                 if Server.led_brightness_controller:
-                    Server.action.append((str(unixTime),intensity))
-                    #print(time)
-                    #print(str(unixTime))
-                    Server.action = sorted(Server.action, key=lambda tup: (tup[0]))
-                    #print(Server.action)
+                    
+                    if str(time.time())<=unixTime:
+                        
+                        action_temp = dict(Server.action)
+                        action_temp[unixTime] = intensity
+                        Server.action = [(k,v) for (k,v) in action_temp.items()]
+
+                        # Server.action.append((str(unixTime),intensity))
+                        Server.isActionValid = True
+                        print(user_time)
+                        print(str(unixTime))
+                        Server.action = sorted(Server.action, key=lambda tup: (tup[0]))
+                        print(Server.action)
+                    else:
+                        Server.isActionValid = False
             return "Test"
 
         @app.route("/schedules/",methods = ["GET","POST"])
         def getSchedules():
-            return json.dumps(dict(Server.action))
+            action_dict = dict(Server.action)
+            action_dict['valid']= Server.isActionValid
+            return json.dumps(action_dict)
             # return Server.action
 
 
@@ -101,9 +117,10 @@ class Server:
                 if len(Server.action)>0:
                     timeToCompare = Server.action[0]
                     #print("Action Time:"+timeToCompare[0] +"    |    System Time:"+string_time+"    |  Server Time To Send: "+str(Server.led_brightness))
-                    if string_time == timeToCompare[0]:
+                    if string_time >= timeToCompare[0]:
                         Server.led_brightness = timeToCompare[1]
                         Server.action.pop(0)
+                     
                 time.sleep(1)
 
 if __name__ == '__main__':
