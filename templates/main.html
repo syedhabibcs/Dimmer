@@ -33,6 +33,14 @@
             text-align: center;
         }
 
+        #success{
+            background: #CCF5CC;
+        }
+
+        #failure{
+            background: red;
+        }
+
        
     </style>
 
@@ -84,6 +92,8 @@
 
                     </select>
                     <button onclick="scheduling()">Add Action</button>
+                    <span id="success"></span>
+                    <span id="failure"></span>
                 </p>
                 <p>Scheduling Type:
                     <form action="">
@@ -191,6 +201,19 @@
                 if (this.readyState == 4 && this.status == 200) {
                     jsonDict = JSON.parse(this.responseText)
                     var isValid = jsonDict['valid'];
+                    if(isValid)
+                    {
+                        
+                        $('#success').fadeIn();
+                        $('#success').text("Action created successfully!");
+                        $('#success').fadeOut(3000);
+                        // setTimeout(function(){$('#success').fadeIn();}, 10000);
+                    }
+                    else{
+                        $('#failure').fadeIn();
+                        $('#failure').text("Not a valid action!");
+                        $('#failure').fadeOut(3000);
+                    }
                     console.log(isValid)
                     console.log(jsonDict);
                     console.log(typeof (jsonDict));
