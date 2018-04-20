@@ -3,20 +3,41 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='epoch.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='odometer-theme-default.css') }}">
+
     <style>
         .sliderCss {
-            height: 200px;
-            width: 0px;
+            height: 300px;
+            width: 90px;
         }
 
         #red .noUi-connect {
             background: #c0392b;
         }
 
+        .noUi-vertical .noUi-handle {
+            width: 100px;
+            height: 30px;
+        }
+
+        p,
+        li {
+            font-size: 18px;
+        }
+
+        h2 {
+            background-color: #9e8f96;
+            color: antiquewhite;
+            text-align: center;
+        }
+
         .inputBar {
             font-size: 25px;
             text-align: center;
-            width: 5%;
+            width: 40%;
         }
 
         .inputBar[type=number]:focus {
@@ -29,13 +50,12 @@
             padding: 10px;
             border: 5px solid rgb(255, 102, 0);
             margin: 0;
-            font-size: 100px;
+            font-size: 110px;
             text-align: center;
         }
 
         .showSchedule {
             list-style-type: square;
-            float: right;
         }
 
         #success {
@@ -46,129 +66,146 @@
             background: rgb(194, 67, 67);
             color: white;
         }
-
-        .luxvalue {
-            float: left;
-            width: 49%;
-        }
-
-        .intensityChart {
-            float: left;
-        }
-
-        .lineChart_class {
-            float: left;
-        }
-
-        .auto_manual {
-            float: left;
-            width: 10%;
-        }
-
-        .showSchedule {
-            float: left;
-            width: 30%;
-        }
-
-        .action {
-            float: left;
-        }
     </style>
-
-    <link rel="stylesheet" href="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='epoch.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='odometer-theme-default.css') }}">
 </head>
 
 <body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <h2 class="text-center">
+                    Brightness (Blue) vs Lux (Orange)
+                </h2>
+                <br>
+                <div id="lineChart" class="epoch" style="width: 1200px; height: 600px"></div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-1">
+                    </div>
+                    <div class="col-md-11">
+                        <h2>
+                            Light Brighness
+                        </h2>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-2"></div>
+                            <div class="col-md-3">
+                                <div id="slider" class="sliderCss noUi-connect"></div>
+                            </div>
+                            <br>
+                            <br>
+                            <br>
+                            <div class="col-md-4">
+                                <input id="input-format" class="inputBar" type="number" step="10">
+                            </div>
+                            <div class="col-md-5">
+                            </div>
 
-    <div class="luxvalue">
-        <h1>Lux Value:</h1>
-        <div id="odometer" format: '(,ddd).dd' class="odometer"></div>
-    </div>
-    <div class="container">
-        <h1>Light Brighness:</h1>
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-1">
-                    <div id="slider" class="sliderCss noUi-connect"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-sm-*">
-                    <input id="input-format" class="inputBar" type="number" step="10">
+                <br>
+                <div class="row">
+                    <div class="col-md-1">
+                    </div>
+                    <div class="col-md-11">
+                        <h2>
+                            Lux Value
+                        </h2>
+                        <div id="odometer" format: '(,ddd).dd' class="odometer"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-10">
+                        <h2 class="text-left">
+                            Create Action
+                        </h2>
+
+                        <div class="action">
+                            Time:
+                            <input type="time" id="myTime" step="10">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    +Current Time
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" data-type=1 href="#">+20s</a>
+                                    <a class="dropdown-item" data-type=2 href="#">+30s</a>
+                                    <a class="dropdown-item" data-type=3 href="#">+40s</a>
+                                    <a class="dropdown-item" data-type=4 href="#">+50s</a>
+                                    <a class="dropdown-item" data-type=5 href="#">+60s</a>
+                                    <a class="dropdown-item" data-type=6 href="#">+70s</a>
+                                    <a class="dropdown-item" data-type=7 href="#">+80s</a>
+                                    <a class="dropdown-item" data-type=8 href="#">+90s</a>
+                                    <a class="dropdown-item" data-type=9 href="#">+100s</a>
+                                    <a class="dropdown-item" data-type=10 href="#">+110s</a>
+                                    <a class="dropdown-item" data-type=11 href="#">+120s</a>
+                                    <a class="dropdown-item" data-type=12 href="#">+130s</a>
+                                    <a class="dropdown-item" data-type=13 href="#">+140s</a>
+                                    <a class="dropdown-item" data-type=14 href="#">+150s</a>
+                                    <a class="dropdown-item" data-type=15 href="#">+160s</a>
+                                    <a class="dropdown-item" data-type=16 href="#">+170s</a>
+                                    <a class="dropdown-item" data-type=17 href="#">+180s</a>
+                                </div>
+                            </div>
+                            Intensity/Brightness:
+                            <select id="intensity">
+                                <option value="0">0 %</option>
+                                <option value="1">10 %</option>
+                                <option value="2">20 %</option>
+                                <option value="3">30 %</option>
+                                <option value="4">40 %</option>
+                                <option value="5">50 %</option>
+                                <option value="6">60 %</option>
+                                <option value="7">70 %</option>
+                                <option value="8">80 %</option>
+                                <option value="9">90 %</option>
+                                <option value="10">100 %</option>
+
+                            </select>
+                            <button onclick="scheduling()">Add Action</button>
+                            <span id="success"></span>
+                            <span id="failure"></span>
+
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="auto_manual">
+                            <p>Scheduling Type: </p>
+                            <form action="">
+                                <input type="radio" id="r1" checked="checked" name="schedule_type" value="manual"> Manual
+                                <input type="radio" id="r2" name="schedule_type" value="automatic"> Automatic
+                            </form>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h2 class="text-left">
+                    Scheduled Events:
+                </h2>
+                <div class="showSchedule_class">
+                    <ul id="scheduled_actions" class="showSchedule"></ul>
+                    <br></br>
                 </div>
             </div>
         </div>
     </div>
-
-
-    <div class="intensityChart">
-        <h1>Intensity Graph</h1>
-        <div id="intensityChart" class="epoch" style="width: 800px; height: 400px"></div>
-    </div>
-
-    <div class="lineChart_class">
-        <h1>Lux Graph</h1>
-        <div id="lineChart" class="epoch" style="width: 800px; height: 400px"></div>
-        <br></br>
-    </div>
-
-
-    <div class="auto_manual">
-        <p>Scheduling Type:
-            <br>
-        </p>
-        <form action="">
-            <input type="radio" id="r1" checked="checked" name="schedule_type" value="manual"> Manual
-            <br>
-            <input type="radio" id="r2" name="schedule_type" value="automatic"> Automatic
-            <br>
-        </form>
-        </p>
-    </div>
-
-    <div class="showSchedule_class">
-        <ul id="scheduled_actions" class="showSchedule"></ul>
-        <br></br>
-    </div>
-
-    <div class="action">
-        <p>Create Action:
-            <p>
-                Time:
-                <input type="time" id="myTime" step="10">
-                <button onclick="setCurrentTime()">Current Time</button>
-                Intensity/Brightness:
-                <select id="intensity">
-                    <option value="0">0 %</option>
-                    <option value="1">10 %</option>
-                    <option value="2">20 %</option>
-                    <option value="3">30 %</option>
-                    <option value="4">40 %</option>
-                    <option value="5">50 %</option>
-                    <option value="6">60 %</option>
-                    <option value="7">70 %</option>
-                    <option value="8">80 %</option>
-                    <option value="9">90 %</option>
-                    <option value="10">100 %</option>
-
-                </select>
-                <button onclick="scheduling()">Add Action</button>
-                <span id="success"></span>
-                <span id="failure"></span>
-            </p>
-
-        </p>
-
-        </p>
-    </div>
-
-
-
-
-
-
-
 
 
 
@@ -192,7 +229,11 @@
 
     <script>
 
+<<<<<<< HEAD
         http_url = 'http://140.193.222.165:5000/'
+=======
+        http_url = 'http://192.168.0.15:5000/'
+>>>>>>> 8292c8b409a1140cad7e9864fa48056f2a1e271b
 
         var xhr = new XMLHttpRequest();
         var data = new FormData();
@@ -330,6 +371,7 @@
         //--------------------------------------------------------------//
 
         var lineChartData = [
+            { label: 'Series 2', values: [], range: [0, 100] },
             { label: 'Series-1', values: [], range: [0, 500] }
         ];
 
@@ -337,60 +379,47 @@
             type: 'time.line',
             data: lineChartData,
             range: {
-                left: [0, 500]
+                left: [0, 500],
+                right: [0, 100]
             },
-            axes: ['bottom', 'left'],
-            // ticks: { time: 30 },
-            // windowSize: 180,
-            ticks: { time: 5, left: 8 },
-            windowSize: 30,
+            axes: ['bottom', 'left', 'right'],
+            ticks: { time: 30, left: 10, right: 8 },
+            windowSize: 180,
+            // ticks: { time: 5, left: 10, right: 8 },
+            // windowSize: 30,
         });
-
-        var layer_num = 0  // insert here the number of the layer
-        var catname = "category2"  // insert here the css class category
-        myChart.getVisibleLayers()[layer_num].className = "layer " + catname
-
-        var intensityChartData = [
-            { label: 'Series 2', values: [], range: [0, 100] }
-        ];
-
-        var intensityChart = $('#intensityChart').epoch({
-            type: 'time.line',
-            data: intensityChartData,
-            range: {
-                left: [0, 100]
-            },
-            axes: ['bottom', 'left'],
-            // ticks: { time: 30 },
-            // windowSize: 180,
-            ticks: { time: 5, left: 10 },
-            windowSize: 30,
-        });
-
 
         $(function pollChart() {
             setTimeout(function () {
                 $.ajax({
                     type: 'GET', url: http_url.concat('chart/'), success: function (data) {
                         //Update flux value                        
-                        myChart.push([{ time: data['seconds'][0], y: data['seconds'][1] }]);
-                        intensityChart.push([{ time: data['seconds'][0], y: data['led_brightness'] }]);
+                        myChart.push([{ time: data['seconds'][0], y: data['led_brightness'] }, { time: data['seconds'][0], y: data['seconds'][1] }]);
                         pollChart();
                     }, dataType: "json"
                 });
             }, 1000);
         });
 
-        function setCurrentTime() {
+
+        $(".dropdown-menu a").click(function () {
+            var type = $(this).data("type");
+
             var time_input = document.getElementById("myTime");
-            var d = new Date(),
-                h = d.getHours(),
-                m = d.getMinutes();
+            var d = new Date();
+
+            d.setSeconds(d.getSeconds() + ((type + 1) * 10));
+            var h = d.getHours();
+            var m = d.getMinutes();
+            var s = d.getSeconds();
+
             if (h < 10) h = '0' + h;
             if (m < 10) m = '0' + m;
+            if (s < 10) s = '0' + s;
 
-            time_input.value = h + ':' + m
-        }
+            time_input.value = h + ':' + m + ':' + s;
+        });
+
     </script>
 </body>
 
