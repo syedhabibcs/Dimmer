@@ -42,7 +42,8 @@
         }
 
         #failure {
-            background: red;
+            background: rgb(194, 67, 67);
+            color: white;
         }
     </style>
 
@@ -205,9 +206,9 @@
 
 
             xhr.open('POST', http_url.concat("action/"), true);
-            schedule_data.append('time',time_input);
-            schedule_data.append('intensity',intensity);
-            schedule_data.append('radio',radio.checked);
+            schedule_data.append('time', time_input);
+            schedule_data.append('intensity', intensity);
+            schedule_data.append('radio', radio.checked);
 
             xhr.send(schedule_data);
             schedule_data.delete('time')
@@ -223,13 +224,12 @@
 
                         $('#success').fadeIn();
                         $('#success').text("Action created successfully!");
-                        $('#success').fadeOut(3000);
-                        // setTimeout(function(){$('#success').fadeIn();}, 10000);
+                        $('#success').fadeOut(5000);
                     }
                     else {
                         $('#failure').fadeIn();
                         $('#failure').text("Not a valid action!");
-                        $('#failure').fadeOut(3000);
+                        $('#failure').fadeOut(5000);
                     }
                     console.log(isValid)
                     console.log(jsonDict);
@@ -243,11 +243,13 @@
                     var actions = document.getElementById("scheduled_actions");
                     while (actions.firstChild) actions.removeChild(actions.firstChild);
                     for (var unixtime in jsonDict) {
-                        var newDate = new Date();
-                        newDate.setTime(unixtime * 1000);
-                        var li = document.createElement("li");
-                        li.textContent = "Time: " + newDate.toLocaleTimeString() + ", Intensity: " + jsonDict[unixtime];
-                        actions.appendChild(li);
+                        if (unixtime != 'valid') {
+                            var newDate = new Date();
+                            newDate.setTime(unixtime * 1000);
+                            var li = document.createElement("li");
+                            li.textContent = "Time: " + newDate.toLocaleTimeString() + ", Intensity: " + jsonDict[unixtime];
+                            actions.appendChild(li);
+                        }
                     }
                 }
             };
