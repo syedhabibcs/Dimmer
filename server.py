@@ -11,6 +11,8 @@ class Server:
     lux_svalue = 0
     led_brightness = 50
 
+    power = 0
+
     led_brightness_controller = False #false means manual meaning controlled by slider and True means scheduling
 
     isActionValid = True
@@ -28,6 +30,7 @@ class Server:
         def index():
             if request.method == "POST":
                 Server.lux_svalue = request.form['lux_sensor_value']
+                Server.power = request.form['power']
                 # print("Printing the lux sensor value received from Client: %s"%Server.lux_svalue)
             return str(Server.led_brightness)
             
@@ -85,7 +88,7 @@ class Server:
         @app.route("/chart/",methods = ["GET","POST"])
         def getChartValue():
             time_lux = ((int(time.time()), Server.lux_svalue))
-            chart_dic={'seconds': time_lux, 'led_brightness': Server.led_brightness}
+            chart_dic={'seconds': time_lux, 'led_brightness': Server.led_brightness,'power': Server.power}
             return json.dumps(chart_dic)
             
     def stringtoUnixTime(self, string_time):
