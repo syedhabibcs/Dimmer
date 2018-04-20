@@ -33,13 +33,15 @@
             text-align: center;
         }
 
-       
+        ul.b {
+            list-style-type: square;
+        }
     </style>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.min.css">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='odometer-theme-default.css') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='epoch.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='odometer-theme-default.css') }}">
 </head>
 
 <body>
@@ -52,7 +54,7 @@
                     <div id="slider" class="sliderCss noUi-connect"></div>
                 </div>
                 <div class="col-sm-*">
-                    <input id="input-format" class="inputBar" type="number">
+                    <input id="input-format" class="inputBar" type="number" step="10">
                 </div>
             </div>
         </div>
@@ -63,40 +65,57 @@
         <div id="odometer" format: '(,ddd).dd' class="odometer"></div>
     </div>
 
-    <div id="lineChart" class="epoch" style="width: 800px; height: 400px"></div>
+    <h1>Intensity Graph</h1>
     <div id="intensityChart" class="epoch" style="width: 800px; height: 400px"></div>
 
-        <div>
-            <p>Create Action:            
-                <p>
-                    Time:<input type="time" id="myTime" step="10"> 
-                    Intensity/Brightness:<select id="intensity">
-                        <option value="0">0 %</option>
-                        <option value="1">10 %</option>
-                        <option value="2">20 %</option>
-                        <option value="3">30 %</option>
-                        <option value="4">40 %</option>
-                        <option value="5">50 %</option>
-                        <option value="6">60 %</option>
-                        <option value="7">70 %</option>
-                        <option value="8">80 %</option>
-                        <option value="9">90 %</option>
-                        <option value="10">100 %</option>
+    <br></br>
 
-                    </select>
-                    <button onclick="scheduling()">Add Action</button>
-                </p>
-                <p>Scheduling Type:
-                    <form action="">
-                        <input type="radio" id="r1" checked="checked" name="schedule_type" value="manual"> Manual<br>
-                        <input type="radio" id="r2" name="schedule_type" value="automatic"> Automatic<br>
-                    </form>
-                </p>
+    <h1>Lux Graph</h1>
+    <div id="lineChart" class="epoch" style="width: 800px; height: 400px"></div>
+
+    <div>
+        <p>Create Action:
+            <p>
+                Time:
+                <input type="time" id="myTime" step="10">
+                <button onclick="setCurrentTime()">Current Time</button>
+                Intensity/Brightness:
+                <select id="intensity">
+                    <option value="0">0 %</option>
+                    <option value="1">10 %</option>
+                    <option value="2">20 %</option>
+                    <option value="3">30 %</option>
+                    <option value="4">40 %</option>
+                    <option value="5">50 %</option>
+                    <option value="6">60 %</option>
+                    <option value="7">70 %</option>
+                    <option value="8">80 %</option>
+                    <option value="9">90 %</option>
+                    <option value="10">100 %</option>
+
+                </select>
+                <button onclick="scheduling()">Add Action</button>
             </p>
-        </div>
+
+            <p>Scheduling Type:
+                <form action="">
+                    <input type="radio" id="r1" checked="checked" name="schedule_type" value="manual"> Manual
+                    <br>
+                    <input type="radio" id="r2" name="schedule_type" value="automatic"> Automatic
+                    <br>
+                </form>
+            </p>
+        </p>
+    </div>
 
     </div>
-    <div id="lineChart" style="width: 800px; height: 200px"></div>
+
+    <ul id="scheduled_actions" class="b"></ul>
+
+    <!-- /////////////////////////////////////////////////////////////////////////////
+    End of HTML///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////// -->
+
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v3.min.js"></script>
@@ -118,6 +137,7 @@
         //--------------------------------------------------------------//
 
         var sliderFormat = document.getElementById('slider');
+
         noUiSlider.create(sliderFormat, {
             start: 20,
             step: 10,
@@ -154,16 +174,16 @@
         });
 
         //--------------------------------------------------------------//
-        //Lux Value-----------------------------------------------------//
+        //Events--------------------------------------------------------//
         //--------------------------------------------------------------//
 
         xhr = new XMLHttpRequest();
         var schedule_data = new FormData();
         //scheduling:
-        function scheduling(){
-            var dict ={};
+        function scheduling() {
+            var dict = {};
             var time_input = document.getElementById("myTime").value;
-            if( (time_input.split(":")).length==2){
+            if ((time_input.split(":")).length == 2) {
                 time_input = time_input.concat(":00");
             }
 
@@ -173,32 +193,45 @@
             // dict['intensity']=intensity;
             var radio = document.getElementById("r2").checked;
             // dict['radio']=radio;
-        
-            
-            xhr.open('POST', 'http://140.193.91.230:5000/action/', true);
-            schedule_data.append('time',time_input);
-            schedule_data.append('intensity',intensity);
-            schedule_data.append('radio',radio);
-            
+
+
+            xhr.open('POST', http_url.concat("action/"), true);
+            schedule_data.append('time', time_input);
+            schedule_data.append('intensity', intensity);
+            schedule_data.append('radio', radio);
+
             xhr.send(schedule_data);
             schedule_data.delete('time')
             schedule_data.delete('intensity')
             schedule_data.delete('radio')
 
             xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
+            xhttp.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
                     jsonDict = JSON.parse(this.responseText)
                     console.log(jsonDict);
                     console.log(typeof (jsonDict));
+
+                    $('#error_message').fadeIn().html("Action added successfully");
+                    setTimeout(function () {
+                        $('#error_message').fadeOut("slow");
+                    }, 2000);
+
+                    var actions = document.getElementById("scheduled_actions");
+                    while (actions.firstChild) actions.removeChild(actions.firstChild);
+                    for (var unixtime in jsonDict) {
+                        var newDate = new Date();
+                        newDate.setTime(unixtime * 1000);
+                        var li = document.createElement("li");
+                        li.textContent = "Time: " + newDate.toLocaleTimeString() + ", Intensity: " + jsonDict[unixtime];
+                        actions.appendChild(li);
+                    }
                 }
             };
-            xhttp.open("GET", 'http://140.193.91.230:5000/schedules/', true);
+            xhttp.open("GET", http_url.concat("schedules/"), true);
             xhttp.send();
-  
         }
 
-        // var i=2;
         $(function poll() {
             var $meter_lux_value = $('#odometer');
             setTimeout(function () {
@@ -226,14 +259,14 @@
                 left: [0, 500]
             },
             axes: ['bottom', 'left'],
-            // ticks: { time: 30 },
-            // windowSize: 180,
-            ticks: { time: 5, left: 8 },
-            windowSize: 30,
+            ticks: { time: 30 },
+            windowSize: 180,
+            // ticks: { time: 5, left: 8 },
+            // windowSize: 30,
         });
 
         var intensityChartData = [
-            { label: 'Series 1', values: [], range: [0, 500] }
+            { label: 'Series 1', values: [], range: [0, 100] }
         ];
 
         var intensityChart = $('#intensityChart').epoch({
@@ -243,12 +276,12 @@
                 left: [0, 100]
             },
             axes: ['bottom', 'left'],
-            // ticks: { time: 30 },
-            // windowSize: 180,
-            ticks: { time: 5, left: 10 },
-            windowSize: 30,
+            ticks: { time: 30 },
+            windowSize: 180,
+            // ticks: { time: 5, left: 10 },
+            // windowSize: 30,
         });
-        
+
 
         $(function pollChart() {
             setTimeout(function () {
@@ -256,12 +289,23 @@
                     type: 'GET', url: http_url.concat('chart/'), success: function (data) {
                         //Update flux value                        
                         myChart.push([{ time: data['seconds'][0], y: data['seconds'][1] }]);
+                        intensityChart.push([{ time: data['seconds'][0], y: data['led_brightness'] }]);
                         pollChart();
                     }, dataType: "json"
                 });
             }, 1000);
         });
 
+        function setCurrentTime() {
+            var time_input = document.getElementById("myTime");
+            var d = new Date(),
+                h = d.getHours(),
+                m = d.getMinutes();
+            if (h < 10) h = '0' + h;
+            if (m < 10) m = '0' + m;
+
+            time_input.value = h + ':' + m
+        }
     </script>
 </body>
 

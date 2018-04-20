@@ -41,7 +41,7 @@ class Server:
                     value = request.form[field]
                     if (Server.led_brightness_controller)==False:
                         self.setLedBrightness(value)
-                        print(value)
+                        #print(value)
             return render_template("main.html")
 
         @app.route("/flux/",methods = ["GET","POST"])
@@ -61,10 +61,10 @@ class Server:
                 Server.led_brightness_controller = radio
                 if Server.led_brightness_controller:
                     Server.action.append((str(unixTime),intensity))
-                    print(time)
-                    print(str(unixTime))
+                    #print(time)
+                    #print(str(unixTime))
                     Server.action = sorted(Server.action, key=lambda tup: (tup[0]))
-                    print(Server.action)
+                    #print(Server.action)
             return "Test"
 
         @app.route("/schedules/",methods = ["GET","POST"])
@@ -77,7 +77,7 @@ class Server:
         @app.route("/chart/",methods = ["GET","POST"])
         def getChartValue():
             time_lux = ((int(time.time()), Server.lux_svalue))
-            chart_dic={'seconds': time_lux}
+            chart_dic={'seconds': time_lux, 'led_brightness': Server.led_brightness}
             return json.dumps(chart_dic)
             
 
@@ -96,11 +96,11 @@ class Server:
         timeToCompare = ""
         while True:
             if Server.led_brightness_controller:
-                print("Server time to send: "+str(Server.led_brightness))
+                #print("Server time to send: "+str(Server.led_brightness))
                 string_time = str(int(time.time()))
                 if len(Server.action)>0:
                     timeToCompare = Server.action[0]
-                    print("Action Time:"+timeToCompare[0] +"    |    System Time:"+string_time+"    |  Server Time To Send: "+str(Server.led_brightness))
+                    #print("Action Time:"+timeToCompare[0] +"    |    System Time:"+string_time+"    |  Server Time To Send: "+str(Server.led_brightness))
                     if string_time == timeToCompare[0]:
                         Server.led_brightness = timeToCompare[1]
                         Server.action.pop(0)
