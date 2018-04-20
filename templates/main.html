@@ -106,11 +106,7 @@
 
     <script>
 
-<<<<<<< HEAD
         http_url = 'http://140.193.91.230:5000/'
-=======
-        http_url = 'http://140.193.207.68:5000/'
->>>>>>> 3b323f243fb73d98ba0364411b5bd785d1a075fd
 
         var xhr = new XMLHttpRequest();
         var data = new FormData();
@@ -171,17 +167,15 @@
             }
 
             console.log(time_input)
-            // dict['time']=time_input.value;
             var intensity = document.getElementById("intensity").selectedIndex;
-            // dict['intensity']=intensity;
-            var radio = document.getElementById("r2").checked;
-            // dict['radio']=radio;
+            var radio = document.getElementById("r2");
+            radio.checked = true;
         
             
             xhr.open('POST', http_url.concat("action/"), true);
             schedule_data.append('time',time_input);
             schedule_data.append('intensity',intensity);
-            schedule_data.append('radio',radio);
+            schedule_data.append('radio',radio.checked);
             
             xhr.send(schedule_data);
             schedule_data.delete('time')
@@ -196,6 +190,8 @@
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     jsonDict = JSON.parse(this.responseText)
+                    var isValid = jsonDict['valid'];
+                    console.log(isValid)
                     console.log(jsonDict);
                     console.log(typeof (jsonDict));
                 }
