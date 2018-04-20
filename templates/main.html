@@ -3,19 +3,41 @@
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='epoch.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='odometer-theme-default.css') }}">
+
     <style>
         .sliderCss {
             height: 300px;
+            width: 90px;
         }
 
         #red .noUi-connect {
             background: #c0392b;
         }
 
+        .noUi-vertical .noUi-handle {
+            width: 100px;
+            height: 30px;
+        }
+
+        p,
+        li {
+            font-size: 18px;
+        }
+
+        h2 {
+            background-color: #9e8f96;
+            color: antiquewhite;
+            text-align: center;
+        }
+
         .inputBar {
             font-size: 25px;
             text-align: center;
-            width: 30%;
+            width: 40%;
         }
 
         .inputBar[type=number]:focus {
@@ -45,11 +67,6 @@
             color: white;
         }
     </style>
-
-    <link rel="stylesheet" href="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='epoch.min.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='odometer-theme-default.css') }}">
 </head>
 
 <body>
@@ -70,13 +87,13 @@
                     <div class="col-md-1">
                     </div>
                     <div class="col-md-11">
-                        <h2 class="text-left">
+                        <h2>
                             Light Brighness
                         </h2>
                         <br>
                         <div class="row">
                             <div class="col-md-2"></div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <div id="slider" class="sliderCss noUi-connect"></div>
                             </div>
                             <br>
@@ -85,7 +102,7 @@
                             <div class="col-md-4">
                                 <input id="input-format" class="inputBar" type="number" step="10">
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-5">
                             </div>
 
                         </div>
@@ -96,7 +113,7 @@
                     <div class="col-md-1">
                     </div>
                     <div class="col-md-11">
-                        <h2 class="text-left">
+                        <h2>
                             Lux Value
                         </h2>
                         <div id="odometer" format: '(,ddd).dd' class="odometer"></div>
@@ -215,7 +232,7 @@
 
     <script>
 
-        http_url = 'http://140.193.207.68:5000/'
+        http_url = 'http://192.168.0.15:5000/'
 
         var xhr = new XMLHttpRequest();
         var data = new FormData();
@@ -365,10 +382,10 @@
                 right: [0, 100]
             },
             axes: ['bottom', 'left', 'right'],
-            // ticks: { time: 30 },
-            // windowSize: 180,
-            ticks: { time: 5, left: 10, right: 8 },
-            windowSize: 30,
+            ticks: { time: 30, left: 10, right: 8 },
+            windowSize: 180,
+            // ticks: { time: 5, left: 10, right: 8 },
+            // windowSize: 30,
         });
 
         $(function pollChart() {
