@@ -58,7 +58,7 @@ class Server:
                 if radio == 'true':
                     Server.led_brightness_controller = True
 
-                print("Controller: %r" % Server.led_brightness_controller)
+                # print("Controller: %r" % Server.led_brightness_controller)
                 if Server.led_brightness_controller:
                     
                     if str(time.time())<=unixTime:
@@ -68,10 +68,10 @@ class Server:
                         Server.action = [(k,v) for (k,v) in action_temp.items()]
 
                         Server.isActionValid = True
-                        print(user_time)
-                        print(str(unixTime))
+                        # print(user_time)
+                        # print(str(unixTime))
                         Server.action = sorted(Server.action, key=lambda tup: (tup[0]))
-                        print(Server.action)
+                        # print(Server.action)
                     else:
                         Server.isActionValid = False
             return "Test"
