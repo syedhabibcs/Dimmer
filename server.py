@@ -122,6 +122,7 @@ if __name__ == '__main__':
     thread = threading.Thread(target=server.sendScheduledSignals, args=())
     thread.daemon = True                            # Daemonize thread
     thread.start()
-    app.run(debug=True, host='0.0.0.0')
+    # app.run(debug=True, host='0.0.0.0')
+    app.run(debug=True)
 
 
