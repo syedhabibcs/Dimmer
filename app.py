@@ -26,72 +26,73 @@ class Server:
         
         return None
 
-    def routes(self):
-
-        @app.route('/',methods = ["GET","POST"])
-        def index():
-            if request.method == "POST":
-                Server.lux_svalue = request.form['lux_sensor_value']
-                Server.power = request.form['power']
-                # print("Printing the lux sensor value received from Client: %s"%Server.lux_svalue)
-            return str(Server.led_brightness)
+    @app.route('/',methods = ["GET","POST"])
+    def index():
+        if request.method == "POST":
+            Server.lux_svalue = request.form['lux_sensor_value']
+            Server.power = request.form['power']
+            # print("Printing the lux sensor value received from Client: %s"%Server.lux_svalue)
+        return str(Server.led_brightness)
             
 
-        @app.route("/signal/",methods = ["GET","POST"])
-        def setSignal():
-            if request.method == "POST":
-                for field in request.form.keys():
-                    value = request.form[field]
-                    Server.led_brightness_controller=False
-                    self.setLedBrightness(value)                        
-            return render_template("main.html")
+    @app.route("/signal/",methods = ["GET","POST"])
+    def setSignal():
+        if request.method == "POST":
+            for field in request.form.keys():
+                value = request.form[field]
+                Server.led_brightness_controller=False
+                self.setLedBrightness(value)                        
+        return render_template("main.html")
 
-        @app.route("/flux/",methods = ["GET","POST"])
-        def getFluxValue():
-            return json.dumps({'lux_value': str(Server.lux_svalue)})
+    @app.route("/flux/",methods = ["GET","POST"])
+    def getFluxValue():
+        return json.dumps({'lux_value': str(Server.lux_svalue)})
 
-        @app.route("/action/",methods = ["GET","POST"])
-        def registerAction():
-            if request.method == "POST":
+    @app.route("/action/",methods = ["GET","POST"])
+    def registerAction():
+        if request.method == "POST":
+            
+            user_time = request.form['time']
+            unixTime = self.stringtoUnixTime(user_time)
+            intensity = str(int(request.form['intensity'])*10)
+            radio = request.form['radio']
+            
+            #
+            if radio == 'true':
+                Server.led_brightness_controller = True
+
+            # print("Controller: %r" % Server.led_brightness_controller)
+            if Server.led_brightness_controller:
                 
-                user_time = request.form['time']
-                unixTime = self.stringtoUnixTime(user_time)
-                intensity = str(int(request.form['intensity'])*10)
-                radio = request.form['radio']
-                
-                #
-                if radio == 'true':
-                    Server.led_brightness_controller = True
-
-                # print("Controller: %r" % Server.led_brightness_controller)
-                if Server.led_brightness_controller:
+                if str(time.time())<=unixTime:
                     
-                    if str(time.time())<=unixTime:
-                        
-                        action_temp = dict(Server.action)
-                        action_temp[unixTime] = intensity
-                        Server.action = [(k,v) for (k,v) in action_temp.items()]
+                    action_temp = dict(Server.action)
+                    action_temp[unixTime] = intensity
+                    Server.action = [(k,v) for (k,v) in action_temp.items()]
 
-                        Server.isActionValid = True
-                        # print(user_time)
-                        # print(str(unixTime))
-                        Server.action = sorted(Server.action, key=lambda tup: (tup[0]))
-                        # print(Server.action)
-                    else:
-                        Server.isActionValid = False
-            return "Test"
+                    Server.isActionValid = True
+                    # print(user_time)
+                    # print(str(unixTime))
+                    Server.action = sorted(Server.action, key=lambda tup: (tup[0]))
+                    # print(Server.action)
+                else:
+                    Server.isActionValid = False
+        return "Test"
 
-        @app.route("/schedules/",methods = ["GET","POST"])
-        def getSchedules():
-            action_dict = dict(Server.action)
-            action_dict['valid']= Server.isActionValid
-            return json.dumps(action_dict)
+    @app.route("/schedules/",methods = ["GET","POST"])
+    def getSchedules():
+        action_dict = dict(Server.action)
+        action_dict['valid']= Server.isActionValid
+        return json.dumps(action_dict)
 
-        @app.route("/chart/",methods = ["GET","POST"])
-        def getChartValue():
-            time_lux = ((int(time.time()), Server.lux_svalue))
-            chart_dic={'seconds': time_lux, 'led_brightness': Server.led_brightness,'power': Server.power}
-            return json.dumps(chart_dic)
+    @app.route("/chart/",methods = ["GET","POST"])
+    def getChartValue():
+        time_lux = ((int(time.time()), Server.lux_svalue))
+        chart_dic={'seconds': time_lux, 'led_brightness': Server.led_brightness,'power': Server.power}
+        return json.dumps(chart_dic)
+    # def routes(self):
+
+        
             
     def stringtoUnixTime(self, string_time):
         addedYMD = time.strftime("%Y")+"-"+time.strftime("%m")+"-"+time.strftime("%d")+" "+string_time
@@ -120,11 +121,11 @@ class Server:
 if __name__ == '__main__':
     server = Server()
     # app =  server.run()
-    server.routes()
+    # server.routes()
     thread = threading.Thread(target=server.sendScheduledSignals, args=())
     thread.daemon = True                            # Daemonize thread
     thread.start()
-    # app.run(debug=True, host='0.0.0.0')
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
+    # app.run(debug=True)
 
 
