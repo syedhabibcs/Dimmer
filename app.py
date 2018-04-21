@@ -5,6 +5,8 @@ from datetime import datetime
 import threading
 import time
 
+app = Flask(__name__)
+
 class Server:
 
     # This will be set from the user input from the web client
@@ -20,9 +22,9 @@ class Server:
 
 
     def run(self):
-        app = Flask(__name__)
+        # app = Flask(__name__)
         
-        return app
+        return None
 
     def routes(self):
 
@@ -117,7 +119,7 @@ class Server:
 
 if __name__ == '__main__':
     server = Server()
-    app =  server.run()
+    # app =  server.run()
     server.routes()
     thread = threading.Thread(target=server.sendScheduledSignals, args=())
     thread.daemon = True                            # Daemonize thread
