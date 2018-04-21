@@ -370,18 +370,18 @@
 
         var lineChartData = [
             { label: 'Series 2', values: [], range: [0, 100] },
-            { label: 'Series-1', values: [], range: [0, 500] }
+            { label: 'Series-1', values: [], range: [0, 13000] }
         ];
 
         var myChart = $('#lineChart').epoch({
             type: 'time.line',
             data: lineChartData,
             range: {
-                left: [0, 500],
+                left: [0, 13000],
                 right: [0, 100]
             },
             axes: ['bottom', 'left', 'right'],
-            ticks: { time: 30, left: 10, right: 8 },
+            ticks: { time: 30, left: 13, right: 8 },
             windowSize: 180,
             // ticks: { time: 5, left: 10, right: 8 },
             // windowSize: 30,
