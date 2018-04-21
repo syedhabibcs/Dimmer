@@ -37,7 +37,7 @@
         .inputBar {
             font-size: 25px;
             text-align: center;
-            width: 40%;
+            width: 50%;
         }
 
         .inputBar[type=number]:focus {
@@ -229,7 +229,8 @@
 
     <script>
 
-        http_url = 'http://140.193.245.244:5000/'
+        // http_url = 'http://192.168.0.17:5000/'
+        http_url = 'https://dimmerbrightness.herokuapp.com/'
 
         var xhr = new XMLHttpRequest();
         var data = new FormData();
@@ -242,7 +243,7 @@
         var sliderFormat = document.getElementById('slider');
 
         noUiSlider.create(sliderFormat, {
-            start: 20,
+            start: 0,
             step: 10,
             orientation: 'vertical',
             range: {
@@ -261,11 +262,11 @@
 
         var inputFormat = document.getElementById('input-format');
         inputFormat.addEventListener('change', function () {
-            sliderFormat.noUiSlider.set(this.value);
+            sliderFormat.noUiSlider.set(100-this.value);
         });
 
         sliderFormat.noUiSlider.on('update', function (values, handle) {
-            inputFormat.value = values[handle];
+            inputFormat.value = 100-values[handle];
         });
 
         sliderFormat.noUiSlider.on('set', function (values, handle) {
@@ -273,7 +274,8 @@
             var radio = document.getElementById("r1");
             radio.checked = true;
             xhr.open('POST', http_url.concat("signal/"), true);
-            data.append('led_value', values[handle]);
+            
+            data.append('led_value', 100-values[handle]);
             xhr.send(data);
             data.delete('led_value')
         });
@@ -389,6 +391,7 @@
             setTimeout(function () {
                 $.ajax({
                     type: 'GET', url: http_url.concat('chart/'), success: function (data) {
+                        console.log(data['led_brightness'])
                         //Update flux value                        
                         myChart.push([{ time: data['seconds'][0], y: data['led_brightness'] }, { time: data['seconds'][0], y: data['seconds'][1] }]);
                         pollChart();

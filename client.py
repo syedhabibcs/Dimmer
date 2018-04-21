@@ -11,10 +11,10 @@ class Client:
 
     #url = 'http://0.0.0.0:5000/'
     #signalUrl = 'http://0.0.0.0:5000/signal/'
-    url = 'http://140.193.219.234:5000/'
+    url = 'http://140.193.245.244:5000'
     signalUrl = 'http://140.193.219.234:5000/signal/'
 
-    lux_sensor = {}
+    gpio_input = {}
     DEBUG = False
 
 
@@ -39,38 +39,68 @@ class Client:
         data=response.text
         return data
 
-    def sendLuxSensorValue(self):
+    def sendLuxSensorValue(self, getLux):
         while True:
-            lux_value = '{:0.2f}'.format(self.getLuxSensorValue())
-            self.log("lux_sensor: " + lux_value)
-            Client.lux_sensor['lux_sensor_value'] = lux_value
-            response = self.connect(Client.url, False, Client.lux_sensor)
+            if getLux:
+                lux_value = '{:0.2f}'.format(self.getLuxSensorValue())
+            else:
+                lux_value =-1
+            self.log("lux_sensor: " + str(lux_value))
+            Client.gpio_input['lux_sensor_value'] = lux_value
+            Client.gpio_input['power'] = self.receiveFromGPIO()
+            response = self.connect(Client.url, False, Client.gpio_input)
             time.sleep(1)
             led_brightness = response.text
             self.log("Intensity: "+led_brightness)
-            self.setGPIO(led_brightness)
+            self.setToGPIO(led_brightness)
 
-
-    def setGPIO(self, led_brightness):
+    def setUpGPIO(self):
         numOfBits = 4 #number of bits required to represent the required states
         # will set the GPIO pins
-        gpio_pins=[17, 27, 22, 23] #Using BCM modes
+        gpio__out_pins=[17, 27, 22, 23] #Using BCM modes
+        gpio__in_pins=[5, 16, 13, 19] #Using BCM modes
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         for i in range(0,numOfBits):
-            GPIO.setup(gpio_pins[i], GPIO.OUT)
+            GPIO.setup(gpio__out_pins[i], GPIO.OUT)
+            GPIO.setup(gpio__in_pins[i], GPIO.IN)
+
+
+    def setToGPIO(self, led_brightness):
+        numOfBits = 4 #number of bits required to represent the required states
+        # will set the GPIO pins
+        gpio__out_pins=[17, 27, 22, 23] #Using BCM modes
+        gpio__in_pins=[5, 16, 13, 19] #Using BCM modes
+        
 
         pinToSet = self.ledBrightnessToGpio(led_brightness)
         self.log("GPIO Pins: "+pinToSet)
 
         for i in range(0,numOfBits):
             if int(pinToSet[i]) == 1:
-                GPIO.output(gpio_pins[i], GPIO.HIGH)
+                GPIO.output(gpio__out_pins[i], GPIO.HIGH)
             else:   #Redundent, left for future uses
-                GPIO.output(gpio_pins[i], GPIO.LOW)
+                GPIO.output(gpio__out_pins[i], GPIO.LOW)
             #time.sleep(1)
 
         return None
+
+    def receiveFromGPIO(self):
+        numOfBits = 4 #number of bits required to represent the required states
+        # will set the GPIO pins
+        gpio__in_pins=[5, 16, 13, 19] #Using BCM modes
+        
+        pinInput = []
+        self.log("GPIO Pins: "+pinToSet)
+        power_Binary=""
+
+        for i in range(0,numOfBits):
+            # pinInput.append(GPIO.input(gpio__in_pins[i]))
+            power_Binary+=GPIO.input(gpio__in_pins[i])
+            # time.sleep(1)
+        return str(int(power_Binary,2))
+        
+    
 
     def getLuxSensorValue(self):
         # Get I2C bus
@@ -119,7 +149,12 @@ class Client:
 if __name__ == '__main__':
 
     client = Client()
+    client.setUpGPIO()
+
     if len(sys.argv)>1 and sys.argv[1]=="debug":
         client.DEBUG = True
 
-    client.sendLuxSensorValue()
+    if len(sys.argv)>1 and (sys.argv[1]=="nolux" or sys.argv[2]=="nolux"):
+        client.sendLuxSensorValue(False)
+    else:
+        client.sendLuxSensorValue(True)
