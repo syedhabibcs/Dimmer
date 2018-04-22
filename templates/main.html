@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='epoch.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='significant.styles.epoch.css') }}">
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
     <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='odometer-theme-default.css') }}"> -->
 
     <style>
@@ -188,10 +189,8 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <p>Scheduling Type: </p>
-                                    <form action="">
-                                        <input type="radio" id="r1" checked="checked" name="schedule_type" value="manual"> Manual
-                                        <input type="radio" id="r2" name="schedule_type" value="automatic"> Automatic
-                                    </form>
+                                    <input id="schedule_type" type="checkbox" checked data-toggle="toggle" data-on="Automatic" data-off="Manual" data-onstyle="success"
+                                        data-offstyle="warning">
                                     </p>
                                 </div>
                                 <div class="col-md-8">
@@ -245,6 +244,7 @@
     <script src="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='epoch.custom.js') }}"></script>
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
     <!-- <script src="http://github.hubspot.com/odometer/odometer.js"></script> -->
 
     <script>
@@ -254,7 +254,6 @@
 
         var xhr = new XMLHttpRequest();
         var data = new FormData();
-
 
         //--------------------------------------------------------------//
         //Slider--------------------------------------------------------//
@@ -290,9 +289,7 @@
         });
 
         sliderFormat.noUiSlider.on('set', function (values, handle) {
-
-            var radio = document.getElementById("r1");
-            radio.checked = true;
+            $("#schedule_type").bootstrapToggle('off');
             xhr.open('POST', http_url.concat("signal/"), true);
 
             data.append('led_value', 100 - values[handle]);
@@ -315,14 +312,12 @@
             }
 
             var intensity = document.getElementById("intensity").selectedIndex;
-            var radio = document.getElementById("r2");
-            radio.checked = true;
-
+            $("#schedule_type").bootstrapToggle('on');
 
             xhr.open('POST', http_url.concat("action/"), true);
             schedule_data.append('time', time_input);
             schedule_data.append('intensity', intensity);
-            schedule_data.append('radio', radio.checked);
+            schedule_data.append('radio', true);
 
             xhr.send(schedule_data);
             schedule_data.delete('time')
@@ -468,7 +463,7 @@
                 $.ajax({
                     type: 'GET', url: http_url.concat('chart/'), success: function (data) {
                         //Update flux value
-                        powerBrightnessChart.push([{ time: data['seconds'][0], y: data['led_brightness'] }, { time: data['seconds'][0], y: data['power']}]);
+                        powerBrightnessChart.push([{ time: data['seconds'][0], y: data['led_brightness'] }, { time: data['seconds'][0], y: data['power'] }]);
                         luxBrightnessChart.push([{ time: data['seconds'][0], y: data['led_brightness'] }, { time: data['seconds'][0], y: data['seconds'][1] }]);
                         luxChart.push([{ time: data['seconds'][0], y: data['seconds'][1] }]);
                         pollChart();
