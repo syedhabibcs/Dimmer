@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='epoch.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='significant.styles.epoch.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='odometer-theme-default.css') }}">
 
     <style>
@@ -73,11 +74,11 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-8">
-                <h2 class="text-center">
-                    Brightness (Blue) vs Lux (Orange)
-                </h2>
+                <h2 id=graphHeading class="text-center"></h2>
                 <br>
-                <div id="lineChart" class="epoch" style="width: 1200px; height: 600px"></div>
+                <div id="PowerBrightness" class="epoch" style="width: 1200px; height: 600px"></div>
+                <div id="LuxBrightness" class="epoch" style="width: 1200px; height: 600px"></div>
+                <div id="Lux" class="epoch my-colors" style="width: 1200px; height: 600px"></div>
             </div>
             <div class="col-md-4">
                 <div class="row">
@@ -183,12 +184,30 @@
                 <div class="row">
                     <div class="col-md-10">
                         <div class="auto_manual">
-                            <p>Scheduling Type: </p>
-                            <form action="">
-                                <input type="radio" id="r1" checked="checked" name="schedule_type" value="manual"> Manual
-                                <input type="radio" id="r2" name="schedule_type" value="automatic"> Automatic
-                            </form>
-                            </p>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <p>Scheduling Type: </p>
+                                    <form action="">
+                                        <input type="radio" id="r1" checked="checked" name="schedule_type" value="manual"> Manual
+                                        <input type="radio" id="r2" name="schedule_type" value="automatic"> Automatic
+                                    </form>
+                                    </p>
+                                </div>
+                                <div class="col-md-8">
+                                    <p>Graph Type: </p>
+                                    <form id="GraphType">
+                                        <label>
+                                            <input type="radio" value=1 name="graphRadio" checked /> Reference Signal vs Actual Signal
+                                        </label>
+                                        <label>
+                                            <input type="radio" value=2 name="graphRadio" /> Reference Signal vs Lux
+                                        </label>
+                                        <label>
+                                            <input type="radio" value=3 name="graphRadio" /> Lux
+                                        </label>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -224,13 +243,13 @@
     <script src="https://d3js.org/d3.v3.min.js"></script>
     <script src="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='epoch.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='epoch.custom.js') }}"></script>
     <script src="http://github.hubspot.com/odometer/odometer.js"></script>
 
     <script>
 
-        // http_url = 'http://192.168.0.17:5000/'
-        http_url = 'https://dimmerbrightness.herokuapp.com/'
+        http_url = 'http://192.168.0.15:5000/'
+        // http_url = 'https://dimmerbrightness.herokuapp.com/'
 
         var xhr = new XMLHttpRequest();
         var data = new FormData();
@@ -262,11 +281,11 @@
 
         var inputFormat = document.getElementById('input-format');
         inputFormat.addEventListener('change', function () {
-            sliderFormat.noUiSlider.set(100-this.value);
+            sliderFormat.noUiSlider.set(100 - this.value);
         });
 
         sliderFormat.noUiSlider.on('update', function (values, handle) {
-            inputFormat.value = 100-values[handle];
+            inputFormat.value = 100 - values[handle];
         });
 
         sliderFormat.noUiSlider.on('set', function (values, handle) {
@@ -274,8 +293,8 @@
             var radio = document.getElementById("r1");
             radio.checked = true;
             xhr.open('POST', http_url.concat("signal/"), true);
-            
-            data.append('led_value', 100-values[handle]);
+
+            data.append('led_value', 100 - values[handle]);
             xhr.send(data);
             data.delete('led_value')
         });
@@ -294,7 +313,6 @@
                 time_input = time_input.concat(":00");
             }
 
-            console.log(time_input)
             var intensity = document.getElementById("intensity").selectedIndex;
             var radio = document.getElementById("r2");
             radio.checked = true;
@@ -368,14 +386,35 @@
         //Lux Chart-----------------------------------------------------//
         //--------------------------------------------------------------//
 
-        var lineChartData = [
-            { label: 'Series 2', values: [], range: [0, 100] },
-            { label: 'Series-1', values: [], range: [0, 13000] }
-        ];
+        var power = { label: 'power', values: [], range: [0, 100] };
+        var brightness = { label: 'brightness', values: [], range: [0, 100] };
+        var lux = { label: 'luxChart', values: [], range: [0, 13000] };
+        var currentGraph = 1;
+        $('#PowerBrightness').show()
+        $('#LuxBrightness').hide()
+        $('#graphHeading').text("Reference Signal (Blue-Solid) vs Feedback Signal (Orange-Dash)");
 
-        var myChart = $('#lineChart').epoch({
+
+        $('#Lux').hide()
+
+        var powerBrightnessData = [brightness, power];
+        var powerBrightnessChart = $('#PowerBrightness').epoch({
             type: 'time.line',
-            data: lineChartData,
+            data: powerBrightnessData,
+            range: {
+                left: [0, 100]
+            },
+            axes: ['bottom', 'left'],
+            ticks: { time: 30, left: 11 },
+            windowSize: 180,
+            // ticks: { time: 3, left: 11 },
+            // windowSize: 27,
+        });
+
+        var luxBrightnessData = [brightness, lux];
+        var luxBrightnessChart = $('#LuxBrightness').epoch({
+            type: 'time.line',
+            data: luxBrightnessData,
             range: {
                 left: [0, 13000],
                 right: [0, 100]
@@ -383,17 +422,54 @@
             axes: ['bottom', 'left', 'right'],
             ticks: { time: 30, left: 13, right: 8 },
             windowSize: 180,
-            // ticks: { time: 5, left: 10, right: 8 },
+            // ticks: { time: 5, left: 13, right: 8 },
             // windowSize: 30,
+        });
+
+        var luxData = [lux];
+        var luxChart = $('#Lux').epoch({
+            type: 'time.line',
+            data: luxData,
+            range: {
+                left: [0, 13000]
+            },
+            axes: ['bottom', 'left'],
+            ticks: { time: 30, left: 13 },
+            windowSize: 180,
+            // ticks: { time: 5, left: 13 },
+            // windowSize: 30,
+        });
+
+        $('#GraphType input').on('change', function () {
+            currentGraph = $("#GraphType input[type='radio']:checked").val();
+            if (currentGraph == 1) {
+                $('#PowerBrightness').show()
+                $('#LuxBrightness').hide()
+                $('#Lux').hide()
+                $('#graphHeading').text("Reference Signal (Blue-Solid) vs Feedback Signal (Orange-Dash)");
+            }
+            else if (currentGraph == 2) {
+                $('#PowerBrightness').hide()
+                $('#LuxBrightness').show()
+                $('#Lux').hide()
+                $('#graphHeading').text("Reference Signal  (Blue-Solid) vs Lux (Orange-Dash)");
+            }
+            else if (currentGraph == 3) {
+                $('#PowerBrightness').hide()
+                $('#LuxBrightness').hide()
+                $('#Lux').show()
+                $('#graphHeading').text("Lux Feedback");
+            }
         });
 
         $(function pollChart() {
             setTimeout(function () {
                 $.ajax({
                     type: 'GET', url: http_url.concat('chart/'), success: function (data) {
-                        console.log(data['led_brightness'])
-                        //Update flux value                        
-                        myChart.push([{ time: data['seconds'][0], y: data['led_brightness'] }, { time: data['seconds'][0], y: data['seconds'][1] }]);
+                        //Update flux value
+                        powerBrightnessChart.push([{ time: data['seconds'][0], y: data['led_brightness'] }, { time: data['seconds'][0], y: data['power']}]);
+                        luxBrightnessChart.push([{ time: data['seconds'][0], y: data['led_brightness'] }, { time: data['seconds'][0], y: data['seconds'][1] }]);
+                        luxChart.push([{ time: data['seconds'][0], y: data['seconds'][1] }]);
                         pollChart();
                     }, dataType: "json"
                 });

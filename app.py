@@ -41,7 +41,7 @@ class Server:
             for field in request.form.keys():
                 value = request.form[field]
                 Server.led_brightness_controller=False
-                self.setLedBrightness(value)                        
+                Server.led_brightness = value                        
         return render_template("main.html")
 
     @app.route("/flux/",methods = ["GET","POST"])
@@ -91,18 +91,12 @@ class Server:
         chart_dic={'seconds': time_lux, 'led_brightness': Server.led_brightness,'power': Server.power}
         return json.dumps(chart_dic)
     # def routes(self):
-
-        
             
     def stringtoUnixTime(self, string_time):
         addedYMD = time.strftime("%Y")+"-"+time.strftime("%m")+"-"+time.strftime("%d")+" "+string_time
         dt = datetime.strptime(addedYMD, "%Y-%m-%d %H:%M:%S")
         unixTime = time.mktime(dt.timetuple())
         return str(int(unixTime))
-
-
-    def setLedBrightness(self, led_brightness):
-            Server.led_brightness = led_brightness
 
     def sendScheduledSignals(self):
         

@@ -1,0 +1,54 @@
+.epoch .axis path,
+.epoch .axis line {
+    shape-rendering: crispEdges
+}
+
+.epoch .axis.canvas .tick line {
+    shape-rendering: geometricPrecision
+}
+
+div#_canvas_css_reference {
+    width: 0;
+    height: 0;
+    position: absolute;
+    top: -1000px;
+    left: -1000px
+}
+
+div#_canvas_css_reference svg {
+    position: absolute;
+    width: 0;
+    height: 0;
+    top: -1000px;
+    left: -1000px
+}
+
+.epoch {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 12pt
+}
+
+.epoch .axis path,
+.epoch .axis line {
+    fill: transparent;
+    stroke: #000
+}
+
+.epoch .axis .tick text {
+    font-size: 9pt
+}
+
+.epoch .line {
+    fill: transparent;
+    stroke-width: 3px;
+}
+
+ /* .epoch .category1 .line,
+.epoch.category10 .category1 .line {
+    stroke: #13fa73;
+}
+
+.epoch .category2 .line,
+.epoch.category10 .category2 .line {
+    stroke: #6c06e0;
+} */
