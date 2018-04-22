@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='epoch.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='significant.styles.epoch.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='odometer-theme-default.css') }}">
+    <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='odometer-theme-default.css') }}"> -->
 
     <style>
         .sliderCss {
@@ -114,7 +114,8 @@
                         <h2>
                             Lux Value
                         </h2>
-                        <div id="odometer" format: '(,ddd).dd' class="odometer"></div>
+                        <!-- <div id="odometer" format: '(,ddd).dd' class="odometer"></div> -->
+                        <div id="odometer" class="odometer"></div>
                     </div>
                 </div>
             </div>
@@ -244,7 +245,7 @@
     <script src="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='epoch.custom.js') }}"></script>
-    <script src="http://github.hubspot.com/odometer/odometer.js"></script>
+    <!-- <script src="http://github.hubspot.com/odometer/odometer.js"></script> -->
 
     <script>
 
@@ -375,7 +376,7 @@
             setTimeout(function () {
                 $.ajax({
                     type: 'GET', url: http_url.concat("flux/"), success: function (server_lux_value) {
-                        $meter_lux_value.text(server_lux_value['lux_value']);
+                        $meter_lux_value.text(parseFloat(server_lux_value['lux_value']).toFixed(2));
                         poll();
                     }, dataType: "json"
                 });
