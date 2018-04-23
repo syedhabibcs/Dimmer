@@ -11,7 +11,7 @@ class Server:
 
     # This will be set from the user input from the web client
     lux_svalue = 0
-    led_brightness = 50
+    led_brightness = 100
 
     power = 0
 
@@ -25,7 +25,6 @@ class Server:
         if request.method == "POST":
             Server.lux_svalue = request.form['lux_sensor_value']
             Server.power = request.form['power']
-            # print("Printing the lux sensor value received from Client: %s"%Server.lux_svalue)
         return str(Server.led_brightness)
             
 
@@ -93,7 +92,6 @@ class Server:
                 if string_time >= timeToCompare[0]:
                     Server.led_brightness = timeToCompare[1]
                     Server.action.pop(0)
-            # time.sleep(1)
 
         time_lux = ((int(time.time()), Server.lux_svalue))
         chart_dic={'seconds': time_lux, 'led_brightness': Server.led_brightness,'power': Server.power}
@@ -101,15 +99,6 @@ class Server:
 
 if __name__ == '__main__':
     server = Server()
-
-    # try:
-    #     thread.start_new_thread( sendScheduledSignals, server )
-    # except:
-    #     print("Error: unable to start thread")
-
-    # thread = threading.Thread(target=server.sendScheduledSignals, args=())
-    # thread.daemon = True                            # Daemonize thread
-    # thread.start()
     app.run(debug=True, host='0.0.0.0')
 
 
