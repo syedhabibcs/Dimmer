@@ -9,11 +9,13 @@ import numpy as np
 import RPi.GPIO as GPIO
 import pigpio
 
+import signal
+
 #Execute: "sudo pigpiod"
 class Client:
-#     url = 'http://140.193.205.31:5000'
-#     url = 'http:140.193.220.241:5000'
-    url = 'https://dimmerbrightness.herokuapp.com/'
+    url = 'http://140.193.205.31:5000'
+#     url = 'http://140.193.220.241:5000'
+#     url = 'https://dimmerbrightness.herokuapp.com/'
 
     gpio_input = {}
     DEBUG = None
@@ -22,13 +24,17 @@ class Client:
     digital = None
     pwmValues = None
 
-    def __init__(self, pwmReader, debug, nolux, digital):
-        self.setUpGPIO()
-        self.pwmReader = pwmReader
+    def __init__(self, debug, nolux, digital):
         self.DEBUG = debug
         self.nolux = nolux
         self.digital = digital
         self.pwmValues = []
+        self.setUpGPIO()
+
+        if not digital:
+            self.pwmReader = Reader(pigpio.pi(), 5)
+            print("reaches in const")
+
 
     def connect(self, url, isGet, lux_value):
         try:
@@ -76,13 +82,13 @@ class Client:
         numOfInputBits = 7
         # will set the GPIO pins
         gpio__out_pins = [17, 27, 22, 23]  # Using BCM modes
-        if not self.digital:
-            gpio__in_pins=[5, 6, 13, 19, 26, 16, 20] #Using BCM modes
+        if self.digital:
+            gpio__in_pins=[6, 13, 19, 26, 16, 20, 21] #Using BCM modes
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         for i in range(0, numOfBits):
             GPIO.setup(gpio__out_pins[i], GPIO.OUT)
-        if not self.digital:
+        if self.digital:
             for i in range(0, numOfInputBits):
                 GPIO.setup(gpio__in_pins[i], GPIO.IN)
 
@@ -107,12 +113,13 @@ class Client:
         if self.digital:
             numOfBits = 7 #number of bits required to represent the required states
             # # will set the GPIO pins
-            gpio__in_pins=[5, 6, 13, 19, 26, 16, 20] #Using BCM modes
+            gpio__in_pins=[6, 13, 19, 26, 16, 20, 21] #Using BCM modes
             
             power_Binary=""
 
             for i in range(0,numOfBits):
                 power_Binary+= str(GPIO.input(gpio__in_pins[i]))
+        #     print(power_Binary)
             return str(int(power_Binary,2))
 
         else:
@@ -272,12 +279,13 @@ class Reader:
     #     """
     #     self._cb.cancel()
 
+def signal_handler(signal, frame):
+        print('You pressed Ctrl+C!, exiting...')
+        GPIO.cleanup()  
+        sys.exit(0)
+
 
 if __name__ == '__main__':
-
-    PWM_GPIO = 5
-    pi = pigpio.pi()
-    p = Reader(pi, PWM_GPIO)
 
     debug = False
     nolux = False
@@ -288,8 +296,12 @@ if __name__ == '__main__':
             debug = True
         elif i == "nolux":
             nolux = True
-        elif i == "digial":
+        elif i == "digital":
             digital = True
 
-    client = Client(p, debug, nolux, digital)
+    signal.signal(signal.SIGINT, signal_handler)
+
+    client = Client(debug, nolux, digital)
     client.sendLuxSensorValue()
+
+
