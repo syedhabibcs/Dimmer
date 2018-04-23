@@ -18,8 +18,8 @@ class Client:
     DEBUG = False
     pwmReader = None
 
-    def __init__(self, pwmReader):
-        self.setUpGPIO()
+    def __init__(self, pwmReader, isAnalog):
+        self.setUpGPIO(isAnalog)
         self.pwmReader = pwmReader
 
     def connect(self, url, isGet, lux_value):
@@ -46,7 +46,7 @@ class Client:
         data = response.text
         return data
 
-    def sendLuxSensorValue(self, getLux):
+    def sendLuxSensorValue(self, getLux, isAnalog):
         while True:
             if getLux:
                     lux_value = '{:0.2f}'.format(
@@ -55,7 +55,7 @@ class Client:
                     lux_value = -1
             self.log("lux_sensor: " + str(lux_value))
             Client.gpio_input['lux_sensor_value'] = lux_value
-            Client.gpio_input['power'] = self.receiveFromGPIO()
+            Client.gpio_input['power'] = self.receiveFromGPIO(isAnalog)
             response = self.connect(
                 Client.url, False, Client.gpio_input)
             time.sleep(1)
@@ -63,52 +63,56 @@ class Client:
             self.log("Intensity: "+led_brightness)
             self.setToGPIO(led_brightness)
 
-    def setUpGPIO(self):
+    def setUpGPIO(self, isAnalog):
         numOfBits = 4  # number of bits required to represent the required states
+        numOfInputBits = 7
         # will set the GPIO pins
         gpio__out_pins = [17, 27, 22, 23]  # Using BCM modes
-        # gpio__in_pins = [5, 16, 13, 19]  # Using BCM modes
+        if isAnalog == False:
+            gpio__in_pins=[5, 6, 13, 19, 26, 16, 20] #Using BCM modes
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         for i in range(0, numOfBits):
-                GPIO.setup(gpio__out_pins[i], GPIO.OUT)
-                # GPIO.setup(gpio__in_pins[i], GPIO.IN)
+            GPIO.setup(gpio__out_pins[i], GPIO.OUT)
+        if isAnalog == False:
+            for i in range(0, numOfInputBits):
+                GPIO.setup(gpio__in_pins[i], GPIO.IN)
 
     def setToGPIO(self, led_brightness):
         numOfBits = 4  # number of bits required to represent the required states
         # will set the GPIO pins
         gpio__out_pins = [17, 27, 22, 23]  # Using BCM modes
-        # gpio__in_pins = [5, 16, 13, 19]  # Using BCM modes
 
         pinToSet = self.ledBrightnessToGpio(led_brightness)
         self.log("GPIO Pins: "+pinToSet)
 
         for i in range(0, numOfBits):
-                if int(pinToSet[i]) == 1:
-                        GPIO.output(gpio__out_pins[i], GPIO.HIGH)
-                else:  # Redundent, left for future uses
-                        GPIO.output(gpio__out_pins[i], GPIO.LOW)
-                # time.sleep(1)
+            if int(pinToSet[i]) == 1:
+                    GPIO.output(gpio__out_pins[i], GPIO.HIGH)
+            else:  # Redundent, left for future uses
+                    GPIO.output(gpio__out_pins[i], GPIO.LOW)
+            # time.sleep(1)
 
         return None
 
-    def receiveFromGPIO(self):
-        # numOfBits = 4 #number of bits required to represent the required states
-        # # will set the GPIO pins
-        # gpio__in_pins=[5, 16, 13, 19] #Using BCM modes
-        
-        # pinInput = []
-        # power_Binary=""
+    def receiveFromGPIO(self, isAnalog):
 
-        # for i in range(0,numOfBits):
-        # # pinInput.append(GPIO.input(gpio__in_pins[i]))
-        # power_Binary+= str(GPIO.input(gpio__in_pins[i]))
-        # # time.sleep(1)
-        # return str(int(power_Binary,2))
-        pwmReadingValue = '{:0.2f}'.format(
+        if isAnalog:
+            pwmReadingValue = '{:0.2f}'.format(
             self.pwmReader.duty_cycle());
-        self.log("PWM reading: " + pwmReadingValue);
-        return pwmReadingValue
+            self.log("PWM reading: " + pwmReadingValue);
+            return pwmReadingValue            
+        else:
+            numOfBits = 7 #number of bits required to represent the required states
+            # # will set the GPIO pins
+            gpio__in_pins=[5, 6, 13, 19, 26, 16, 20] #Using BCM modes
+            
+            power_Binary=""
+
+            for i in range(0,numOfBits):
+                power_Binary+= str(GPIO.input(gpio__in_pins[i]))
+            return str(int(power_Binary,2))
+        
 
     def getLuxSensorValue(self):
         # Get I2C bus
@@ -247,12 +251,14 @@ if __name__ == '__main__':
     pi = pigpio.pi()
     p = Reader(pi, PWM_GPIO)
 
-    client = Client(p)
+    if sys.arg[]
+    isAnalog = sys
+    client = Client(p,isAnalog)
 
     if len(sys.argv)>1 and sys.argv[1]=="debug":
-            client.DEBUG = True
+        client.DEBUG = True
 
     if len(sys.argv)>1 and (sys.argv[1]=="nolux" or sys.argv[2]=="nolux"):
-            client.sendLuxSensorValue(False)
+        client.sendLuxSensorValue(False, isAnalog)
     else:
-            client.sendLuxSensorValue(True)
+        client.sendLuxSensorValue(True, isAnalog)
