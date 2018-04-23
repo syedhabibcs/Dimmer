@@ -10,15 +10,16 @@ import pigpio
 
 #Execute: "sudo pigpiod"
 class Client:
-#     url = 'http://140.193.205.31:5000'
+    url = 'http://140.193.205.31:5000'
 #     url = 'http:140.193.220.241:5000'
-    url = 'https://dimmerbrightness.herokuapp.com/'
+#     url = 'https://dimmerbrightness.herokuapp.com/'
 
     gpio_input = {}
     DEBUG = None
     pwmReader = None
     nolux = None
     digital = None
+    pwmValues = []
 
     def __init__(self, pwmReader, debug, nolux, digital):
         self.setUpGPIO()
@@ -53,7 +54,7 @@ class Client:
 
     def sendLuxSensorValue(self):
         while True:
-            if self.nolux:
+            if not self.nolux:
                     lux_value = '{:0.2f}'.format(
                         self.getLuxSensorValue())
             else:
@@ -110,9 +111,13 @@ class Client:
         # power_Binary+= str(GPIO.input(gpio__in_pins[i]))
         # # time.sleep(1)
         # return str(int(power_Binary,2))
-        pwmReadingValue = '{:0.2f}'.format(
-            self.pwmReader.duty_cycle());
-        self.log("PWM reading: " + pwmReadingValue);
+        
+
+
+        pwmReadingValue = str(int(round(self.pwmReader.duty_cycle())))
+
+
+        self.log("PWM reading: " + pwmReadingValue)
         return pwmReadingValue
 
     def getLuxSensorValue(self):
