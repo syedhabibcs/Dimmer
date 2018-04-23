@@ -10,17 +10,22 @@ import pigpio
 
 #Execute: "sudo pigpiod"
 class Client:
-    # url = 'http://140.193.205.31:5000'
-    url = 'http:140.193.220.241:5000'
-    # url = 'https://dimmerbrightness.herokuapp.com/'
+#     url = 'http://140.193.205.31:5000'
+#     url = 'http:140.193.220.241:5000'
+    url = 'https://dimmerbrightness.herokuapp.com/'
 
     gpio_input = {}
-    DEBUG = False
+    DEBUG = None
     pwmReader = None
+    nolux = None
+    digital = None
 
-    def __init__(self, pwmReader, isAnalog):
-        self.setUpGPIO(isAnalog)
+    def __init__(self, pwmReader, debug, nolux, digital):
+        self.setUpGPIO()
         self.pwmReader = pwmReader
+        self.DEBUG = debug
+        self.nolux = nolux
+        self.digital = digital
 
     def connect(self, url, isGet, lux_value):
         try:
@@ -46,16 +51,16 @@ class Client:
         data = response.text
         return data
 
-    def sendLuxSensorValue(self, getLux, isAnalog):
+    def sendLuxSensorValue(self):
         while True:
-            if getLux:
+            if not self.nolux:
                     lux_value = '{:0.2f}'.format(
                         self.getLuxSensorValue())
             else:
                     lux_value = -1
             self.log("lux_sensor: " + str(lux_value))
             Client.gpio_input['lux_sensor_value'] = lux_value
-            Client.gpio_input['power'] = self.receiveFromGPIO(isAnalog)
+            Client.gpio_input['power'] = self.receiveFromGPIO()
             response = self.connect(
                 Client.url, False, Client.gpio_input)
             time.sleep(1)
@@ -63,18 +68,18 @@ class Client:
             self.log("Intensity: "+led_brightness)
             self.setToGPIO(led_brightness)
 
-    def setUpGPIO(self, isAnalog):
+    def setUpGPIO(self):
         numOfBits = 4  # number of bits required to represent the required states
         numOfInputBits = 7
         # will set the GPIO pins
         gpio__out_pins = [17, 27, 22, 23]  # Using BCM modes
-        if isAnalog == False:
+        if not self.digial:
             gpio__in_pins=[5, 6, 13, 19, 26, 16, 20] #Using BCM modes
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         for i in range(0, numOfBits):
             GPIO.setup(gpio__out_pins[i], GPIO.OUT)
-        if isAnalog == False:
+        if not self.digial:
             for i in range(0, numOfInputBits):
                 GPIO.setup(gpio__in_pins[i], GPIO.IN)
 
@@ -95,9 +100,9 @@ class Client:
 
         return None
 
-    def receiveFromGPIO(self, isAnalog):
+    def receiveFromGPIO(self):
 
-        if isAnalog:
+        if self.digital:
             pwmReadingValue = '{:0.2f}'.format(
             self.pwmReader.duty_cycle());
             self.log("PWM reading: " + pwmReadingValue);
@@ -155,8 +160,8 @@ class Client:
         return binary
 
     def log(self, s):
-            if self.DEBUG:
-                print(s)        
+        if self.DEBUG:
+            print(s)        
     
 
 
@@ -251,14 +256,17 @@ if __name__ == '__main__':
     pi = pigpio.pi()
     p = Reader(pi, PWM_GPIO)
 
-    if sys.arg[]
-    isAnalog = sys
-    client = Client(p,isAnalog)
+    debug = False
+    nolux = False
+    digital = False
 
-    if len(sys.argv)>1 and sys.argv[1]=="debug":
-        client.DEBUG = True
+    for i in sys.argv:
+        if i == "debug":
+            debug = True
+        elif i == "nolux":
+            nolux = True
+        elif i == "digial":
+            digital = True
 
-    if len(sys.argv)>1 and (sys.argv[1]=="nolux" or sys.argv[2]=="nolux"):
-        client.sendLuxSensorValue(False, isAnalog)
-    else:
-        client.sendLuxSensorValue(True, isAnalog)
+    client = Client(p, debug, nolux, digital)
+    client.sendLuxSensorValue()
