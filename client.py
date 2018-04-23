@@ -3,6 +3,7 @@ import os
 import smbus
 import time
 import sys
+import numpy as np
 
 # Rasberry pi specific imports
 import RPi.GPIO as GPIO
@@ -71,54 +72,68 @@ class Client:
 
     def setUpGPIO(self):
         numOfBits = 4  # number of bits required to represent the required states
+        numOfInputBits = 7
         # will set the GPIO pins
         gpio__out_pins = [17, 27, 22, 23]  # Using BCM modes
-        # gpio__in_pins = [5, 16, 13, 19]  # Using BCM modes
+        if not self.digial:
+            gpio__in_pins=[5, 6, 13, 19, 26, 16, 20] #Using BCM modes
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         for i in range(0, numOfBits):
-                GPIO.setup(gpio__out_pins[i], GPIO.OUT)
-                # GPIO.setup(gpio__in_pins[i], GPIO.IN)
+            GPIO.setup(gpio__out_pins[i], GPIO.OUT)
+        if not self.digial:
+            for i in range(0, numOfInputBits):
+                GPIO.setup(gpio__in_pins[i], GPIO.IN)
 
     def setToGPIO(self, led_brightness):
         numOfBits = 4  # number of bits required to represent the required states
         # will set the GPIO pins
         gpio__out_pins = [17, 27, 22, 23]  # Using BCM modes
-        # gpio__in_pins = [5, 16, 13, 19]  # Using BCM modes
 
         pinToSet = self.ledBrightnessToGpio(led_brightness)
         self.log("GPIO Pins: "+pinToSet)
 
         for i in range(0, numOfBits):
-                if int(pinToSet[i]) == 1:
-                        GPIO.output(gpio__out_pins[i], GPIO.HIGH)
-                else:  # Redundent, left for future uses
-                        GPIO.output(gpio__out_pins[i], GPIO.LOW)
-                # time.sleep(1)
+            if int(pinToSet[i]) == 1:
+                    GPIO.output(gpio__out_pins[i], GPIO.HIGH)
+            else:  # Redundent, left for future uses
+                    GPIO.output(gpio__out_pins[i], GPIO.LOW)
+            # time.sleep(1)
 
         return None
 
     def receiveFromGPIO(self):
-        # numOfBits = 4 #number of bits required to represent the required states
-        # # will set the GPIO pins
-        # gpio__in_pins=[5, 16, 13, 19] #Using BCM modes
+        if self.digital:
+            numOfBits = 7 #number of bits required to represent the required states
+            # # will set the GPIO pins
+            gpio__in_pins=[5, 6, 13, 19, 26, 16, 20] #Using BCM modes
+            
+            power_Binary=""
+
+            for i in range(0,numOfBits):
+                power_Binary+= str(GPIO.input(gpio__in_pins[i]))
+            return str(int(power_Binary,2))
+
+        else:
+            pwmReadingValue = int(round(self.pwmReader.duty_cycle()))
+
+
+            if np.mean(self.pwmValues) - pwmReadingValue <= 1:
+                pwmReadingValue = self.pwmValues[-1]
+                self.pwmValues.append(pwmReadingValue)
+                if len(self.pwmValues) > 5:
+                    self.pwmValues = self.pwmValues[-5 : 0].reverse()
+            else:
+                self.pwmValues = [pwmReadingValue]
+
+
+
+            pwmReadingValue = str(pwmReadingValue)
+
+            self.log("PWM reading: " + pwmReadingValue)
+
+            return pwmReadingValue
         
-        # pinInput = []
-        # power_Binary=""
-
-        # for i in range(0,numOfBits):
-        # # pinInput.append(GPIO.input(gpio__in_pins[i]))
-        # power_Binary+= str(GPIO.input(gpio__in_pins[i]))
-        # # time.sleep(1)
-        # return str(int(power_Binary,2))
-        
-
-
-        pwmReadingValue = str(int(round(self.pwmReader.duty_cycle())))
-
-
-        self.log("PWM reading: " + pwmReadingValue)
-        return pwmReadingValue
 
     def getLuxSensorValue(self):
         # Get I2C bus
@@ -161,8 +176,8 @@ class Client:
         return binary
 
     def log(self, s):
-            if self.DEBUG:
-                print(s)        
+        if self.DEBUG:
+            print(s)        
     
 
 
@@ -262,12 +277,12 @@ if __name__ == '__main__':
     digital = False
 
     for i in sys.argv:
-            if i == "debug":
-                debug = True
-            elif i == "nolux":
-                nolux = True
-            elif i == "digial":
-                digital = True
+        if i == "debug":
+            debug = True
+        elif i == "nolux":
+            nolux = True
+        elif i == "digial":
+            digital = True
 
     client = Client(p, debug, nolux, digital)
     client.sendLuxSensorValue()
