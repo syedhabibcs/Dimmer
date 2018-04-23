@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='epoch.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='significant.styles.epoch.css') }}">
-    <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='odometer-theme-default.css') }}"> -->
-
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    
     <style>
         .sliderCss {
             height: 300px;
@@ -51,7 +51,7 @@
             padding: 10px;
             border: 5px solid rgb(255, 102, 0);
             margin: 0;
-            font-size: 110px;
+            font-size: 50px;
             text-align: center;
         }
 
@@ -66,6 +66,9 @@
         #failure {
             background: rgb(194, 67, 67);
             color: white;
+        }
+        .logo{
+            float: right;
         }
     </style>
 </head>
@@ -114,7 +117,7 @@
                         <h2>
                             Lux Value
                         </h2>
-                        <!-- <div id="odometer" format: '(,ddd).dd' class="odometer"></div> -->
+                    
                         <div id="odometer" class="odometer"></div>
                     </div>
                 </div>
@@ -122,7 +125,7 @@
         </div>
         <br>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <div class="row">
                     <div class="col-md-10">
                         <h2 class="text-left">
@@ -188,10 +191,8 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <p>Scheduling Type: </p>
-                                    <form action="">
-                                        <input type="radio" id="r1" checked="checked" name="schedule_type" value="manual"> Manual
-                                        <input type="radio" id="r2" name="schedule_type" value="automatic"> Automatic
-                                    </form>
+                                    <input id="schedule_type" type="checkbox" checked data-toggle="toggle" data-on="Automatic" data-off="Manual" data-onstyle="success"
+                                        data-offstyle="warning">
                                     </p>
                                 </div>
                                 <div class="col-md-8">
@@ -215,12 +216,19 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-3">
                 <h2 class="text-left">
                     Scheduled Events:
                 </h2>
                 <div class="showSchedule_class">
                     <ul id="scheduled_actions" class="showSchedule"></ul>
+                    <br></br>
+                </div>
+            </div>
+            <div class="logo col-md-4">
+                <br><br><br><br>
+                <div class="logo">
+                    <img src="https://image.ibb.co/hfh11x/logo.jpg" alt="Logo can't be loaded">
                     <br></br>
                 </div>
             </div>
@@ -245,16 +253,16 @@
     <script src="//cdn.bootcss.com/noUiSlider/8.5.1/nouislider.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='epoch.custom.js') }}"></script>
-    <!-- <script src="http://github.hubspot.com/odometer/odometer.js"></script> -->
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
     <script>
 
-        // http_url = 'http://140.193.205.31:5000/'
+        // http_url = 'http://192.168.0.15:5000/'
+        // http_url = 'http://192.168.0.17:5000/'
         http_url = 'https://dimmerbrightness.herokuapp.com/'
 
         var xhr = new XMLHttpRequest();
         var data = new FormData();
-
 
         //--------------------------------------------------------------//
         //Slider--------------------------------------------------------//
@@ -290,9 +298,7 @@
         });
 
         sliderFormat.noUiSlider.on('set', function (values, handle) {
-
-            var radio = document.getElementById("r1");
-            radio.checked = true;
+            $("#schedule_type").bootstrapToggle('off');
             xhr.open('POST', http_url.concat("signal/"), true);
 
             data.append('led_value', 100 - values[handle]);
@@ -315,14 +321,12 @@
             }
 
             var intensity = document.getElementById("intensity").selectedIndex;
-            var radio = document.getElementById("r2");
-            radio.checked = true;
-
+            $("#schedule_type").bootstrapToggle('on');
 
             xhr.open('POST', http_url.concat("action/"), true);
             schedule_data.append('time', time_input);
             schedule_data.append('intensity', intensity);
-            schedule_data.append('radio', radio.checked);
+            schedule_data.append('radio', true);
 
             xhr.send(schedule_data);
             schedule_data.delete('time')
@@ -345,10 +349,7 @@
                         $('#failure').text("Not a valid action!");
                         $('#failure').fadeOut(5000);
                     }
-                    console.log(isValid)
-                    console.log(jsonDict);
-                    console.log(typeof (jsonDict));
-
+                    
                     $('#error_message').fadeIn().html("Action added successfully");
                     setTimeout(function () {
                         $('#error_message').fadeOut("slow");
@@ -408,8 +409,6 @@
             axes: ['bottom', 'left'],
             ticks: { time: 30, left: 11 },
             windowSize: 180,
-            // ticks: { time: 3, left: 11 },
-            // windowSize: 27,
         });
 
         var luxBrightnessData = [brightness, lux];
@@ -423,8 +422,6 @@
             axes: ['bottom', 'left', 'right'],
             ticks: { time: 30, left: 13, right: 8 },
             windowSize: 180,
-            // ticks: { time: 5, left: 13, right: 8 },
-            // windowSize: 30,
         });
 
         var luxData = [lux];
@@ -437,8 +434,6 @@
             axes: ['bottom', 'left'],
             ticks: { time: 30, left: 13 },
             windowSize: 180,
-            // ticks: { time: 5, left: 13 },
-            // windowSize: 30,
         });
 
         $('#GraphType input').on('change', function () {
@@ -468,7 +463,8 @@
                 $.ajax({
                     type: 'GET', url: http_url.concat('chart/'), success: function (data) {
                         //Update flux value
-                        powerBrightnessChart.push([{ time: data['seconds'][0], y: data['led_brightness'] }, { time: data['seconds'][0], y: data['power']}]);
+                        
+                        powerBrightnessChart.push([{ time: data['seconds'][0], y: data['led_brightness'] }, { time: data['seconds'][0], y: data['power'] }]);
                         luxBrightnessChart.push([{ time: data['seconds'][0], y: data['led_brightness'] }, { time: data['seconds'][0], y: data['seconds'][1] }]);
                         luxChart.push([{ time: data['seconds'][0], y: data['seconds'][1] }]);
                         pollChart();

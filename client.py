@@ -66,12 +66,12 @@ class Client:
                 numOfBits = 4  # number of bits required to represent the required states
                 # will set the GPIO pins
                 gpio__out_pins = [17, 27, 22, 23]  # Using BCM modes
-                gpio__in_pins = [5, 16, 13, 19]  # Using BCM modes
+                # gpio__in_pins = [5, 16, 13, 19]  # Using BCM modes
                 GPIO.setmode(GPIO.BCM)
                 GPIO.setwarnings(False)
                 for i in range(0, numOfBits):
                         GPIO.setup(gpio__out_pins[i], GPIO.OUT)
-                        GPIO.setup(gpio__in_pins[i], GPIO.IN)
+                        # GPIO.setup(gpio__in_pins[i], GPIO.IN)
 
         def setToGPIO(self, led_brightness):
                 numOfBits = 4  # number of bits required to represent the required states
@@ -95,15 +95,14 @@ class Client:
                 # numOfBits = 4 #number of bits required to represent the required states
                 # # will set the GPIO pins
                 # gpio__in_pins=[5, 16, 13, 19] #Using BCM modes
-
+                
                 # pinInput = []
-                # self.log("GPIO Pins: "+pinToSet)
                 # power_Binary=""
 
                 # for i in range(0,numOfBits):
-                #     # pinInput.append(GPIO.input(gpio__in_pins[i]))
-                #     power_Binary+=GPIO.input(gpio__in_pins[i])
-                #     # time.sleep(1)
+                # # pinInput.append(GPIO.input(gpio__in_pins[i]))
+                # power_Binary+= str(GPIO.input(gpio__in_pins[i]))
+                # # time.sleep(1)
                 # return str(int(power_Binary,2))
                 pwmReadingValue = '{:0.2f}'.format(
                     self.pwmReader.duty_cycle());
@@ -152,7 +151,11 @@ class Client:
 
         def log(self, s):
                 if self.DEBUG:
-                        print(s)
+                        print(s)        
+    
+
+
+
 
 
 class Reader:
@@ -244,7 +247,6 @@ class Reader:
     #     Cancels the reader and releases resources.
     #     """
     #     self._cb.cancel()
-
 
 
 if __name__ == '__main__':
