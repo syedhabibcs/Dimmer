@@ -10,7 +10,7 @@ import pigpio
 
 #Execute: "sudo pigpiod"
 class Client:
-        # url = 'http://192.168.0.15:5000'
+        # url = 'http://140.193.205.31:5000'
         url = 'https://dimmerbrightness.herokuapp.com/'
 
         gpio_input = {}
