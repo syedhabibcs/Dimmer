@@ -9,10 +9,8 @@ import RPi.GPIO as GPIO
 
 class Client:
 
-    #url = 'http://0.0.0.0:5000/'
-    #signalUrl = 'http://0.0.0.0:5000/signal/'
-    url = 'http://140.193.245.244:5000'
-    signalUrl = 'http://140.193.219.234:5000/signal/'
+    # url = 'http://192.168.0.15:5000'
+    url = 'https://dimmerbrightness.herokuapp.com/'
 
     gpio_input = {}
     DEBUG = False
@@ -91,12 +89,11 @@ class Client:
         gpio__in_pins=[5, 16, 13, 19] #Using BCM modes
         
         pinInput = []
-        self.log("GPIO Pins: "+pinToSet)
         power_Binary=""
 
         for i in range(0,numOfBits):
             # pinInput.append(GPIO.input(gpio__in_pins[i]))
-            power_Binary+=GPIO.input(gpio__in_pins[i])
+            power_Binary+= str(GPIO.input(gpio__in_pins[i]))
             # time.sleep(1)
         return str(int(power_Binary,2))
         
