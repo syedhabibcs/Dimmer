@@ -41,7 +41,7 @@ class Server:
             for field in request.form.keys():
                 value = request.form[field]
                 Server.led_brightness_controller=False
-                Server.led_brightness = value                        
+                Server.led_brightness = value                     
         return render_template("main.html")
 
     @app.route("/flux/",methods = ["GET","POST"])
@@ -92,6 +92,7 @@ class Server:
     @app.route("/chart/",methods = ["GET","POST"])
     def getChartValue():
         time_lux = ((int(time.time()), Server.lux_svalue))
+        print("Printing Inside /chart:"+str(Server.led_brightness))
         chart_dic={'seconds': time_lux, 'led_brightness': Server.led_brightness,'power': Server.power}
         return json.dumps(chart_dic)
     # def routes(self):
@@ -111,6 +112,7 @@ class Server:
                 if len(Server.action)>0:
                     timeToCompare = Server.action[0]
                     if string_time >= timeToCompare[0]:
+                        
                         Server.led_brightness = timeToCompare[1]
                         Server.action.pop(0)
                      
