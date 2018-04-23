@@ -113,7 +113,7 @@ if __name__ == '__main__':
     #     print("Error: unable to start thread")
 
     thread = threading.Thread(target=server.sendScheduledSignals, args=())
-    # thread.daemon = True                            # Daemonize thread
+    thread.daemon = True                            # Daemonize thread
     thread.start()
     app.run(debug=True, host='0.0.0.0')
 
