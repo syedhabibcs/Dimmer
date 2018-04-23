@@ -10,11 +10,7 @@ import pigpio
 
 
 class Client:
-
-		# url = 'http://0.0.0.0:5000/'
-		# signalUrl = 'http://0.0.0.0:5000/signal/'
-		url = 'http://140.193.245.244:5000'
-		signalUrl = 'http://140.193.219.234:5000/signal/'
+		url = 'http://192.168.0.15:5000'
 
 		gpio_input = {}
 		DEBUG = False
@@ -75,7 +71,7 @@ class Client:
 				numOfBits = 4  # number of bits required to represent the required states
 				# will set the GPIO pins
 				gpio__out_pins = [17, 27, 22, 23]  # Using BCM modes
-				#gpio__in_pins = [5, 16, 13, 19]  # Using BCM modes
+				# gpio__in_pins = [5, 16, 13, 19]  # Using BCM modes
 
 				pinToSet = self.ledBrightnessToGpio(led_brightness)
 				self.log("GPIO Pins: "+pinToSet)
@@ -103,8 +99,9 @@ class Client:
 				#     power_Binary+=GPIO.input(gpio__in_pins[i])
 				#     # time.sleep(1)
 				# return str(int(power_Binary,2))
-
-				return '{:0.2f}'.format(self.pwmReader.duty_cycle())
+				pwmReadingValue = '{:0.2f}'.format(self.pwmReader.duty_cycle());
+				self.log("PWM reading: " + pwmReadingValue);
+				return pwmReadingValue
 
 		def getLuxSensorValue(self):
 				# Get I2C bus
