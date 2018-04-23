@@ -8,8 +8,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='epoch.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='significant.styles.epoch.css') }}">
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
-    <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='odometer-theme-default.css') }}"> -->
-
+    
     <style>
         .sliderCss {
             height: 300px;
@@ -118,7 +117,7 @@
                         <h2>
                             Lux Value
                         </h2>
-                        <!-- <div id="odometer" format: '(,ddd).dd' class="odometer"></div> -->
+                    
                         <div id="odometer" class="odometer"></div>
                     </div>
                 </div>
@@ -255,7 +254,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='epoch.custom.js') }}"></script>
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
-    <!-- <script src="http://github.hubspot.com/odometer/odometer.js"></script> -->
 
     <script>
 
@@ -351,10 +349,7 @@
                         $('#failure').text("Not a valid action!");
                         $('#failure').fadeOut(5000);
                     }
-                    console.log(isValid)
-                    console.log(jsonDict);
-                    console.log(typeof (jsonDict));
-
+                    
                     $('#error_message').fadeIn().html("Action added successfully");
                     setTimeout(function () {
                         $('#error_message').fadeOut("slow");
@@ -414,8 +409,6 @@
             axes: ['bottom', 'left'],
             ticks: { time: 30, left: 11 },
             windowSize: 180,
-            // ticks: { time: 3, left: 11 },
-            // windowSize: 27,
         });
 
         var luxBrightnessData = [brightness, lux];
@@ -429,8 +422,6 @@
             axes: ['bottom', 'left', 'right'],
             ticks: { time: 30, left: 13, right: 8 },
             windowSize: 180,
-            // ticks: { time: 5, left: 13, right: 8 },
-            // windowSize: 30,
         });
 
         var luxData = [lux];
@@ -443,8 +434,6 @@
             axes: ['bottom', 'left'],
             ticks: { time: 30, left: 13 },
             windowSize: 180,
-            // ticks: { time: 5, left: 13 },
-            // windowSize: 30,
         });
 
         $('#GraphType input').on('change', function () {
@@ -474,10 +463,8 @@
                 $.ajax({
                     type: 'GET', url: http_url.concat('chart/'), success: function (data) {
                         //Update flux value
-                        console.log(data['led_brightness'])
+                        
                         powerBrightnessChart.push([{ time: data['seconds'][0], y: data['led_brightness'] }, { time: data['seconds'][0], y: data['power'] }]);
-                        // luxBrightnessChart.push([{ time: data['seconds'][0], y: data['led_brightness'] }, { time: data['seconds'][0], y: data['seconds'][1] }]);
-                        // luxChart.push([{ time: data['seconds'][0], y: data['seconds'][1] }]);
                         pollChart();
                     }, dataType: "json"
                 });
