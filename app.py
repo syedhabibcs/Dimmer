@@ -92,7 +92,7 @@ class Server:
         
         timeToCompare = ""
         while True:
-            print("Inside")
+            # print("Inside")
             if Server.led_brightness_controller:
                 string_time = str(int(time.time()))
                 if len(Server.action)>0:
@@ -106,8 +106,14 @@ class Server:
 
 if __name__ == '__main__':
     server = Server()
+
+    # try:
+    #     thread.start_new_thread( sendScheduledSignals, server )
+    # except:
+    #     print("Error: unable to start thread")
+
     thread = threading.Thread(target=server.sendScheduledSignals, args=())
-    thread.daemon = True                            # Daemonize thread
+    # thread.daemon = True                            # Daemonize thread
     thread.start()
     app.run(debug=True, host='0.0.0.0')
 
