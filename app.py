@@ -74,7 +74,7 @@ class Server:
                     
                 else:
                     Server.isActionValid = False
-        return "Test"
+        return json.dumps(dict(Server.action))
 
     @app.route("/schedules/",methods = ["GET","POST"])
     def getSchedules():
