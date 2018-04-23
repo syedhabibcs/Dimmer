@@ -11,16 +11,16 @@ import pigpio
 
 #Execute: "sudo pigpiod"
 class Client:
-    url = 'http://140.193.205.31:5000'
+#     url = 'http://140.193.205.31:5000'
 #     url = 'http:140.193.220.241:5000'
-#     url = 'https://dimmerbrightness.herokuapp.com/'
+    url = 'https://dimmerbrightness.herokuapp.com/'
 
     gpio_input = {}
     DEBUG = None
     pwmReader = None
     nolux = None
     digital = None
-    pwmValues = []
+    pwmValues = None
 
     def __init__(self, pwmReader, debug, nolux, digital):
         self.setUpGPIO()
@@ -28,6 +28,7 @@ class Client:
         self.DEBUG = debug
         self.nolux = nolux
         self.digital = digital
+        self.pwmValues = []
 
     def connect(self, url, isGet, lux_value):
         try:
@@ -75,13 +76,13 @@ class Client:
         numOfInputBits = 7
         # will set the GPIO pins
         gpio__out_pins = [17, 27, 22, 23]  # Using BCM modes
-        if not self.digial:
+        if not self.digital:
             gpio__in_pins=[5, 6, 13, 19, 26, 16, 20] #Using BCM modes
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(False)
         for i in range(0, numOfBits):
             GPIO.setup(gpio__out_pins[i], GPIO.OUT)
-        if not self.digial:
+        if not self.digital:
             for i in range(0, numOfInputBits):
                 GPIO.setup(gpio__in_pins[i], GPIO.IN)
 
@@ -118,15 +119,21 @@ class Client:
             pwmReadingValue = int(round(self.pwmReader.duty_cycle()))
 
 
-            if np.mean(self.pwmValues) - pwmReadingValue <= 1:
+            if( len(self.pwmValues) == 0):
+                mean = 500
+            else:
+                mean = np.mean(self.pwmValues)
+
+        #     print(abs(mean - pwmReadingValue))
+
+            if abs(mean - pwmReadingValue) <= 2:
+                # print("received" + str( pwmReadingValue ) + " old value" + str (self.pwmValues[-1]) )
                 pwmReadingValue = self.pwmValues[-1]
                 self.pwmValues.append(pwmReadingValue)
                 if len(self.pwmValues) > 5:
-                    self.pwmValues = self.pwmValues[-5 : 0].reverse()
+                    self.pwmValues.pop(0)
             else:
                 self.pwmValues = [pwmReadingValue]
-
-
 
             pwmReadingValue = str(pwmReadingValue)
 
