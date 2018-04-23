@@ -99,22 +99,6 @@ class Server:
         chart_dic={'seconds': time_lux, 'led_brightness': Server.led_brightness,'power': Server.power}
         return json.dumps(chart_dic)
 
-    def sendScheduledSignals(self):
-        
-        timeToCompare = ""
-        while True:
-            # print("Inside")
-            if Server.led_brightness_controller:
-                string_time = str(int(time.time()))
-                if len(Server.action)>0:
-                    timeToCompare = Server.action[0]
-                    if string_time >= timeToCompare[0]:
-                        
-                        Server.led_brightness = timeToCompare[1]
-                        Server.action.pop(0)
-                     
-                time.sleep(1)
-
 if __name__ == '__main__':
     server = Server()
 
