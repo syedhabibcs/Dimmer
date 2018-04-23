@@ -264,8 +264,5 @@ if __name__ == '__main__':
             elif i == "digial":
                 digital = True
 
-
     client = Client(p, debug, nolux, digital)
-
-                
     client.sendLuxSensorValue()
