@@ -53,7 +53,11 @@ class Server:
         if request.method == "POST":
             
             user_time = request.form['time']
-            unixTime = self.stringtoUnixTime(user_time)
+
+            addedYMD = time.strftime("%Y")+"-"+time.strftime("%m")+"-"+time.strftime("%d")+" "+user_time
+            dt = datetime.strptime(addedYMD, "%Y-%m-%d %H:%M:%S")
+            unixTime = str(int(time.mktime(dt.timetuple())))
+
             intensity = str(int(request.form['intensity'])*10)
             radio = request.form['radio']
             
