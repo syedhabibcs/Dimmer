@@ -3,14 +3,17 @@
 Hosted at: https://dimmerbrightness.herokuapp.com/signal/
 
 ## Running the Client Script
-There are 2 configurations for client script. This instructions assume the file is on desktop.
-To run script: Open terminal, execute "cd Desktop", now we should be in Desktop where the client script resides.
+There are 3 configurations for client script. This instructions assume the file is on desktop.
+To run script: 
+1. Open terminal 
+2. execute "cd Desktop", now we should be in Desktop where the client script resides. 
+3. Run the script "python client.py configurations"
 
 ### Different Configurations:
-1. "python client.py": this runs client with lux sensor with no output on terminal
-2. "python client.py nolux": this runs client without lux sensor (-1) with no output on terminal
-3. "python client.py debug": this runs client with lux sensor and prints output. This could be used to see client is sending and getting sensible data from server.
-4. "python client.py debug nolux": this runs client without lux sensor and prints output. This could be used to see client is sending and getting sensible data from server.
+1. "" (Default): this runs client with:  lux sensor + no output on terminal + using PWM for Actual power (feedback)
+2. "nolux": this runs client without lux sensor (-1)
+3. "debug": this runs client that prints output. This could be used to see client is sending and getting sensible data from server.
+4. "digital": this runs client digial GPIO (7 bits) for Actual power (feedback)
 
 ### Troubleshooting for client:
 If client is not working even after re-running script, use debug (configuration 3 or 4) and if there is only 1 ouput line and nothing more, it means client cannot connect to server. Possibly because server is down or PI isn't connected to net.
