@@ -84,6 +84,17 @@ class Server:
 
     @app.route("/chart/",methods = ["GET","POST"])
     def getChartValue():
+        timeToCompare = ""
+
+        if Server.led_brightness_controller:
+            string_time = str(int(time.time()))
+            if len(Server.action)>0:
+                timeToCompare = Server.action[0]
+                if string_time >= timeToCompare[0]:
+                    Server.led_brightness = timeToCompare[1]
+                    Server.action.pop(0)
+            # time.sleep(1)
+
         time_lux = ((int(time.time()), Server.lux_svalue))
         chart_dic={'seconds': time_lux, 'led_brightness': Server.led_brightness,'power': Server.power}
         return json.dumps(chart_dic)
@@ -112,9 +123,9 @@ if __name__ == '__main__':
     # except:
     #     print("Error: unable to start thread")
 
-    thread = threading.Thread(target=server.sendScheduledSignals, args=())
-    thread.daemon = True                            # Daemonize thread
-    thread.start()
+    # thread = threading.Thread(target=server.sendScheduledSignals, args=())
+    # thread.daemon = True                            # Daemonize thread
+    # thread.start()
     app.run(debug=True, host='0.0.0.0')
 
 
