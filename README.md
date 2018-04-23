@@ -2,6 +2,12 @@
 
 Hosted at: https://dimmerbrightness.herokuapp.com/signal/
 
+GPIO Output Pins (To dsp): [17, 27, 22, 23]
+Actual Power / Feedback:
+    GPIO Input Pins: [6, 13, 19, 26, 16, 20, 21]
+    or
+    PWM Pin: 5
+
 ## Running the Client Script
 There are 3 configurations for client script. This instructions assume the file is on desktop.
 To run script: 
