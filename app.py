@@ -92,6 +92,7 @@ class Server:
         
         timeToCompare = ""
         while True:
+            print("Inside")
             if Server.led_brightness_controller:
                 string_time = str(int(time.time()))
                 if len(Server.action)>0:
