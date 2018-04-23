@@ -13,9 +13,9 @@ import signal
 
 #Execute: "sudo pigpiod"
 class Client:
-    url = 'http://140.193.205.31:5000'
+#     url = 'http://140.193.205.31:5000'
 #     url = 'http://140.193.220.241:5000'
-#     url = 'https://dimmerbrightness.herokuapp.com/'
+    url = 'https://dimmerbrightness.herokuapp.com/'
 
     gpio_input = {}
     DEBUG = None
@@ -33,7 +33,6 @@ class Client:
 
         if not digital:
             self.pwmReader = Reader(pigpio.pi(), 5)
-            print("reaches in const")
 
 
     def connect(self, url, isGet, lux_value):
@@ -119,7 +118,6 @@ class Client:
 
             for i in range(0,numOfBits):
                 power_Binary+= str(GPIO.input(gpio__in_pins[i]))
-        #     print(power_Binary)
             return str(int(power_Binary,2))
 
         else:
@@ -303,5 +301,3 @@ if __name__ == '__main__':
 
     client = Client(debug, nolux, digital)
     client.sendLuxSensorValue()
-
-
