@@ -10,17 +10,22 @@ import pigpio
 
 #Execute: "sudo pigpiod"
 class Client:
-    # url = 'http://140.193.205.31:5000'
-    url = 'http:140.193.220.241:5000'
-    # url = 'https://dimmerbrightness.herokuapp.com/'
+#     url = 'http://140.193.205.31:5000'
+#     url = 'http:140.193.220.241:5000'
+    url = 'https://dimmerbrightness.herokuapp.com/'
 
     gpio_input = {}
-    DEBUG = False
+    DEBUG = None
     pwmReader = None
+    nolux = None
+    digital = None
 
-    def __init__(self, pwmReader):
+    def __init__(self, pwmReader, debug, nolux, digital):
         self.setUpGPIO()
         self.pwmReader = pwmReader
+        self.DEBUG = debug
+        self.nolux = nolux
+        self.digital = digital
 
     def connect(self, url, isGet, lux_value):
         try:
@@ -46,9 +51,9 @@ class Client:
         data = response.text
         return data
 
-    def sendLuxSensorValue(self, getLux):
+    def sendLuxSensorValue(self):
         while True:
-            if getLux:
+            if self.nolux:
                     lux_value = '{:0.2f}'.format(
                         self.getLuxSensorValue())
             else:
@@ -247,12 +252,20 @@ if __name__ == '__main__':
     pi = pigpio.pi()
     p = Reader(pi, PWM_GPIO)
 
-    client = Client(p)
+    debug = False
+    nolux = False
+    digital = False
 
-    if len(sys.argv)>1 and sys.argv[1]=="debug":
-            client.DEBUG = True
+    for i in sys.argv:
+            if i == "debug":
+                debug = True
+            elif i == "nolux":
+                nolux = True
+            elif i == "digial":
+                digital = True
 
-    if len(sys.argv)>1 and (sys.argv[1]=="nolux" or sys.argv[2]=="nolux"):
-            client.sendLuxSensorValue(False)
-    else:
-            client.sendLuxSensorValue(True)
+
+    client = Client(p, debug, nolux, digital)
+
+                
+    client.sendLuxSensorValue()
