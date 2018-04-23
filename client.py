@@ -118,6 +118,7 @@ class Client:
 
             for i in range(0,numOfBits):
                 power_Binary+= str(GPIO.input(gpio__in_pins[i]))
+            self.log("Input Digital Input pins: " + power_Binary)
             return str(int(power_Binary,2))
 
         else:
