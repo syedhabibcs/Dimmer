@@ -41,7 +41,8 @@ class Server:
             for field in request.form.keys():
                 value = request.form[field]
                 Server.led_brightness_controller=False
-                Server.led_brightness = value                        
+                Server.led_brightness = value
+                print("Printing Inside setSignal:"+str(Server.led_brightness))                        
         return render_template("main.html")
 
     @app.route("/flux/",methods = ["GET","POST"])
@@ -111,7 +112,9 @@ class Server:
                 if len(Server.action)>0:
                     timeToCompare = Server.action[0]
                     if string_time >= timeToCompare[0]:
+                        
                         Server.led_brightness = timeToCompare[1]
+                        print("Printing Inside SendScheduled:"+str(Server.led_brightness))
                         Server.action.pop(0)
                      
                 time.sleep(1)
