@@ -20,12 +20,6 @@ class Server:
     isActionValid = True
     action=[]
 
-
-    def run(self):
-        # app = Flask(__name__)
-        
-        return None
-
     @app.route('/',methods = ["GET","POST"])
     def index():
         if request.method == "POST":
@@ -65,7 +59,7 @@ class Server:
             if radio == 'true':
                 Server.led_brightness_controller = True
 
-            # print("Controller: %r" % Server.led_brightness_controller)
+            
             if Server.led_brightness_controller:
                 
                 if str(time.time())<=unixTime:
@@ -75,13 +69,12 @@ class Server:
                     Server.action = [(k,v) for (k,v) in action_temp.items()]
 
                     Server.isActionValid = True
-                    # print(user_time)
-                    # print(str(unixTime))
+                    
                     Server.action = sorted(Server.action, key=lambda tup: (tup[0]))
-                    # print(Server.action)
+                    
                 else:
                     Server.isActionValid = False
-        return "Test"
+        return json.dumps(dict(Server.action))
 
     @app.route("/schedules/",methods = ["GET","POST"])
     def getSchedules():
@@ -92,16 +85,8 @@ class Server:
     @app.route("/chart/",methods = ["GET","POST"])
     def getChartValue():
         time_lux = ((int(time.time()), Server.lux_svalue))
-        print("Printing Inside /chart:"+str(Server.led_brightness))
         chart_dic={'seconds': time_lux, 'led_brightness': Server.led_brightness,'power': Server.power}
         return json.dumps(chart_dic)
-    # def routes(self):
-            
-    def stringtoUnixTime(self, string_time):
-        addedYMD = time.strftime("%Y")+"-"+time.strftime("%m")+"-"+time.strftime("%d")+" "+string_time
-        dt = datetime.strptime(addedYMD, "%Y-%m-%d %H:%M:%S")
-        unixTime = time.mktime(dt.timetuple())
-        return str(int(unixTime))
 
     def sendScheduledSignals(self):
         
@@ -120,12 +105,9 @@ class Server:
 
 if __name__ == '__main__':
     server = Server()
-    # app =  server.run()
-    # server.routes()
     thread = threading.Thread(target=server.sendScheduledSignals, args=())
     thread.daemon = True                            # Daemonize thread
     thread.start()
     app.run(debug=True, host='0.0.0.0')
-    # app.run(debug=True)
 
 
