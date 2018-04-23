@@ -15,6 +15,8 @@ To run script:
 2. execute "cd Desktop", now we should be in Desktop where the client script resides. 
 3. Run the script "python client.py configurations"
 
+To stop the client press: "Ctrl + C"
+
 ### Different Configurations:
 1. "" (Default): this runs client with:  lux sensor + no output on terminal + using PWM for Actual power (feedback)
 2. "nolux": this runs client without lux sensor (-1)
@@ -25,16 +27,16 @@ To run script:
 If client is not working even after re-running script, use debug (configuration 3 or 4) and if there is only 1 ouput line and nothing more, it means client cannot connect to server. Possibly because server is down or PI isn't connected to net.
 
 ## Setup Raspberry PI from start to running client script:
-1. Install raspbian
-2. Connect to internet and update the system (sudo apt-get update)
-3. Enable SSH , VNC and I2C in "Raspberry Pi Configuration"/Interfaces.
+1. Install raspbian: https://www.raspberrypi.org/help/noobs-setup/2/
+2. Connect to internet and update the system (In terminal type: "sudo apt-get update")
+3. Enable SSH , VNC and I2C in "Top Left Corner(raspberry)/Preferences/Raspberry Pi Configuration/Interfaces".
     - SSH: for file transfer
     - VNC: to manage client script
     - I2C: for lux sensor
 4. Reboot and setup VNC server
-    - Create an account and sign in PI
-    - Choose Direct and cloud connectivity: this lets you automatically access PI after start up
-5. Copy the client.py file from GitHub to Desktop (using some FTP like filezilla or SSH)
+    - Create an account from VNC's webpage and sign-in with this account in PI
+    - Choose Direct and cloud connectivity while setting up: this lets you automatically access PI after start up
+5. Copy the client.py file from GitHub to Desktop
 6. Run the client script
 
 ## Connecting to UofM (EAP) internet
@@ -49,4 +51,4 @@ You will need to access PI somehow for the first time, probably using a monitor.
   password="yourPassword"
   phase2="auth=MSCHAPv2"
 }`
-3. Press Ctrl+X, y, enter to save the file.
+3. To save the file, press "Ctrl+X", y, enter to save the file.
