@@ -141,6 +141,7 @@ class Client:
             else:
                 self.pwmValues = [pwmReadingValue]
 
+            #add gain, pwmReadingValue is the duty cycle in % eg.50% (pwmReadingValue = pwmReadingValue + someVolt * gain) 
             pwmReadingValue = str(pwmReadingValue)
 
             self.log("PWM reading: " + pwmReadingValue)
