@@ -14,6 +14,7 @@ To run script:
 1. Open terminal 
 2. execute "cd Desktop", now we should be in Desktop where the client script resides. 
 3. Run the script "python client.py configurations"
+note: If there's an error running the client write this command:sudo pigpiod
 
 To stop the client press: "Ctrl + C"
 
