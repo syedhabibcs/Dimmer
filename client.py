@@ -62,19 +62,17 @@ class Client:
     def sendLuxSensorValue(self):
         while True:
             if not self.nolux:
-                    lux_value = '{:0.2f}'.format(
-                        self.getLuxSensorValue())
+                    lux_value = '{:0.2f}'.format(self.getLuxSensorValue())
             else:
                     lux_value = -1
             self.log("lux_sensor: " + str(lux_value))
             Client.gpio_input['lux_sensor_value'] = lux_value
             Client.gpio_input['power'] = self.receiveFromGPIO()
-            response = self.connect(
-                Client.url, False, Client.gpio_input)
-            time.sleep(1)
+            response = self.connect(Client.url, False, Client.gpio_input)
             led_brightness = response.text
-            self.log("Intensity: "+led_brightness)
+            self.log("Intensity: " + led_brightness)
             self.setToGPIO(led_brightness)
+            time.sleep(1)
 
     def setUpGPIO(self):
         numOfBits = 4  # number of bits required to represent the required states
